@@ -14,13 +14,13 @@
   button:hover{background:#b5121a}
 </style>
 
-    <link rel="manifest" href="./manifest.json?v=3-85e45845-841f7026">
-    <link rel="icon" href="./ideco-icon-192.png?v=3-85e45845-841f7026" type="image/png">
-    <link rel="apple-touch-icon" sizes="180x180" href="./ideco-apple-touch-icon.png?v=3-85e45845-841f7026">
+    <link rel="manifest" href="./manifest.json?v=3-85e45845-6a0bc836">
+    <link rel="icon" href="./ideco-icon-192.png?v=3-85e45845-6a0bc836" type="image/png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./ideco-apple-touch-icon.png?v=3-85e45845-6a0bc836">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="HỌP ONLINE">
-    <script src="./ideco-pwa.js?v=3-85e45845-841f7026" defer=""></script>
+    <meta name="apple-mobile-web-app-title" content="IDECO VIDEO CALL">
+    <script src="./ideco-pwa.js?v=3-85e45845-6a0bc836" defer=""></script>
   </head>
 <body>
 <main>
@@ -28,8 +28,12 @@
   <p>Họp video nội bộ · đào tạo từ xa · mọi lúc mọi nơi</p>
   <button type="button" onclick="window.IDECO_MEET &amp;&amp; IDECO_MEET.open()">Vào họp</button>
 </main>
+<script>
+  // Trang website: hỏi mật khẩu khi vào ứng dụng (bản nhúng trong ERP không có dòng này nên không hỏi)
+  window.IDECO_MEET_REQUIRE_PASS = true;
+</script>
 <!-- ============================================================================
- IDECO:BEGIN S049 | VIDEO CALL NỘI BỘ (IDECO Meet 1.1 · bản nhúng) — 11/11/2026
+ IDECO:BEGIN S049 | VIDEO CALL NỘI BỘ (IDECO Meet 1.9 · bản nhúng) — 12/11/2026
  VỊ TRÍ: CUỐI FILE, ngay trước </body> (sau SALES_AGENT_EMBED).
  - Nút nhỏ màu đỏ "Video call" ở góc phải, ngay TRÊN nút "Ứng dụng".
    Bấm → popup nhập tên → Vào họp. Camera/micro CHỈ mở khi nhân viên bấm nút.
@@ -39,6 +43,28 @@
  - Toàn bộ giao diện nằm trong Shadow DOM riêng: KHÔNG thêm id, KHÔNG thêm CSS ra
    ngoài trang, KHÔNG đụng các nút/menu hiện có → website không bị biến dạng.
  - Họp chung phòng với file ideco-meet.html (cùng ROOM bên dưới).
+ - KHUNG VIDEO NỔI (mới 1.4): tự hiện khi chia sẻ màn hình hoặc thu nhỏ cuộc họp.
+   Kéo thanh tiêu đề để di chuyển, kéo góc dưới phải để phóng to / thu nhỏ.
+   Có nút micro, "Dừng chia sẻ", "Mở lại cuộc họp". Chrome / Edge máy tính có thêm
+   nút 🗗 để khung nổi trên mọi cửa sổ (vẫn thấy mọi người khi chuyển sang Excel…).
+ - CHAT NHÓM THỜI GIAN THỰC (mới 1.5, Firebase luudulieu02-c546e): nút 💬 cạnh nút Video call
+   và nút "💬 Chat" trong phòng họp. Ai viết tin (ví dụ: "Mời Hương họp online lúc 9h10")
+   thì trên nút Video call của MỌI máy đang mở ERP hiện popup NHẤP NHÁY kèm tiếng chuông,
+   có nút "Vào họp" và "Trả lời". Nút "📣 Mời" mở sẵn ô soạn lời mời.
+   Firebase cần cho phép đọc/ghi nút  ideco_meet_chat  (xem CHAT_DB / CHAT_NODE bên dưới).
+ - MỚI 1.6: khung chat có nút 🔄 tải lại và 🗑 xoá lịch sử (xoá trên mọi máy); khi ai đó đang gõ,
+   các máy khác thấy dòng "✍️ … đang nhập" NHẤP NHÁY (kèm nội dung đang gõ) trên nút Video call.
+   Firebase cần cho phép đọc/ghi thêm nút  ideco_meet_chat_typing  và  ideco_meet_config.
+ - MẬT KHẨU VÀO ỨNG DỤNG: chỉ bật ở trang ideco-meet.html (dòng window.IDECO_MEET_REQUIRE_PASS = true
+   đặt TRƯỚC script này). Bản nhúng trong ERP KHÔNG hỏi mật khẩu. Đổi mật khẩu: Cài đặt → Đổi mật khẩu.
+   Script chỉ chứa mã băm SHA-256, không chứa mật khẩu dạng chữ.
+ - SỬA 1.7: mỗi THẺ trình duyệt là một "máy" riêng → mở 2 thẻ trên cùng một máy cũng thấy popup và
+   dòng "đang nhập" của nhau (trước đây cùng trình duyệt bị coi là tin của chính mình nên không báo).
+   Nhấp nháy luôn bật (kể cả khi Windows tắt hiệu ứng động), mạnh hơn, và tiêu đề thẻ cũng nháy 🔔.
+ - SỬA 1.8: popup nội dung cố định trên màn hình, không bị menu Ứng dụng che;
+   khi đang họp vẫn hiện đầy đủ, giữ đến khi đóng hoặc mở chat.
+ - SỬA 1.9: mỗi tin nhắn mới từ máy/tab khác đều hiện lại popup nội dung,
+   kể cả khi chat đang mở; tin của chính tab gửi không tự báo lại.
  - Chỉnh nhanh: mục CẤU HÌNH ngay đầu script.
  - Tắt tạm: ENABLED = false.   GỠ BỎ: xóa nguyên khối từ BEGIN S049 đến END S049.
  - Kiểm tra: F12 → Console → IDECO_MEET.status()
@@ -62,6 +88,20 @@ var Z          = 2147483647;        // lớp hiển thị (cao nhất)
 var PRESENCE_DB   = 'https://kehoachnew-532cf-default-rtdb.firebaseio.com';
 var PRESENCE_NODE = 'ideco_meet_presence';
 var POLL_MS       = 15000;          // ERP kiểm tra có cuộc họp mỗi 15 giây
+/* Chat nhóm + thông báo nhấp nháy trên nút Video call — Firebase Realtime Database (REST, thời gian thực). '' = tắt chat */
+var CHAT_DB       = 'https://luudulieu02-c546e-default-rtdb.firebaseio.com';
+var CHAT_NODE     = 'ideco_meet_chat';
+var CHAT_KEEP     = 50;             // số tin gần nhất hiển thị trong khung chat
+var CHAT_MAX      = 200;            // tự xoá tin cũ khi vượt quá số này
+var CHAT_POP_AGE  = 3 * 3600000;    // mở ERP sau: vẫn hiện popup cho tin chưa đọc trong 3 giờ gần nhất
+var CHAT_TYPING      = true;        // báo "đang nhập" nhấp nháy trên máy khác khi có người đang gõ
+var CHAT_TYPING_TEXT = true;        // true = hiện luôn nội dung đang gõ · false = chỉ hiện "đang nhập…"
+/* Mật khẩu vào ứng dụng — CHỈ dùng cho trang website (ideco-meet.html đặt window.IDECO_MEET_REQUIRE_PASS = true).
+   Mật khẩu hiện hành lưu trên Firebase (dạng mã băm) tại PASS_NODE/pass; chưa có thì dùng mã băm mặc định bên dưới. */
+var REQUIRE_PASS  = window.IDECO_MEET_REQUIRE_PASS === true;
+var PASS_NODE     = 'ideco_meet_config';
+var PASS_DEFAULT  = '1939ebfec73b53bede8c81672a2a16dcf0f9b838977dd5ebd072c9cf6f9a87dc';   // mã băm của mật khẩu mặc định
+var PASS_ADMIN    = 'e52cbc685513fad1f6298738dfdaff1abc0bd7ec839129e25c03d6d8e65bb1a3';   // mã băm của mật khẩu quản trị (dùng khi đổi mật khẩu)
 /* Máy chủ trung gian giúp nối máy qua 4G / mạng công ty. Có TURN riêng thì thêm vào đây. */
 var ICE_SERVERS = [
   { urls:['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] },
@@ -80,7 +120,76 @@ var IS_MOBILE = IS_IOS || /Android|Mobi/i.test(UA) || (window.matchMedia && matc
 function store(k, v){ try{ if(v === undefined) return localStorage.getItem('imCall.' + k); localStorage.setItem('imCall.' + k, String(v)); }catch(e){ return null; } }
 function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
 function slotOf(id){ return parseInt(id.slice(id.lastIndexOf('-') + 1), 10) || 0; }
+function sha256(str){
+  var K = [], H = [], n = 2, c = 0, i, j, f = function(x){ return ((x - Math.floor(x)) * 4294967296) | 0; };
+  for(; c < 64; n++){ var pr = true; for(i = 2; i * i <= n; i++) if(n % i === 0){ pr = false; break; } if(pr){ if(c < 8) H[c] = f(Math.pow(n, 1 / 2)); K[c++] = f(Math.pow(n, 1 / 3)); } }
+  var s = unescape(encodeURIComponent(String(str))), l = s.length, w = [], W = [];
+  for(i = 0; i < l; i++) w[i >> 2] |= s.charCodeAt(i) << (24 - (i % 4) * 8);
+  w[l >> 2] |= 0x80 << (24 - (l % 4) * 8);
+  w[(((l + 8) >> 6) << 4) + 15] = l * 8;
+  var R = function(x, k){ return (x >>> k) | (x << (32 - k)); };
+  for(i = 0; i < w.length; i += 16){
+    var a = H[0], b = H[1], cc = H[2], d = H[3], e = H[4], ff = H[5], g = H[6], h = H[7];
+    for(j = 0; j < 64; j++){
+      if(j < 16) W[j] = w[i + j] | 0;
+      else{ var x = W[j - 15], y = W[j - 2]; W[j] = (W[j - 16] + (R(x, 7) ^ R(x, 18) ^ (x >>> 3)) + W[j - 7] + (R(y, 17) ^ R(y, 19) ^ (y >>> 10))) | 0; }
+      var t1 = (h + (R(e, 6) ^ R(e, 11) ^ R(e, 25)) + ((e & ff) ^ (~e & g)) + K[j] + W[j]) | 0;
+      var t2 = ((R(a, 2) ^ R(a, 13) ^ R(a, 22)) + ((a & b) ^ (a & cc) ^ (b & cc))) | 0;
+      h = g; g = ff; ff = e; e = (d + t1) | 0; d = cc; cc = b; b = a; a = (t1 + t2) | 0;
+    }
+    H[0] = (H[0] + a) | 0; H[1] = (H[1] + b) | 0; H[2] = (H[2] + cc) | 0; H[3] = (H[3] + d) | 0; H[4] = (H[4] + e) | 0; H[5] = (H[5] + ff) | 0; H[6] = (H[6] + g) | 0; H[7] = (H[7] + h) | 0;
+  }
+  return H.map(function(v){ return ('0000000' + (v >>> 0).toString(16)).slice(-8); }).join('');
+}
+function hashPw(s){ return sha256('ideco-meet|' + String(s)); }
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+/* Khung video nổi — dùng chung cho khung trong trang và cửa sổ nổi trên mọi cửa sổ (🗗) */
+var PIP_CSS = [
+'.pip{pointer-events:auto;position:fixed;left:0;top:0;width:340px;height:290px;z-index:' + Z + ';display:flex;flex-direction:column;background:#1a2232;color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:14px;overflow:hidden;box-shadow:0 16px 44px rgba(26,34,50,.4);font:12px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}',
+'.pip.win{inset:0;width:auto;height:auto;border:0;border-radius:0;box-shadow:none}',
+'.pipHead{flex:none;display:flex;align-items:center;gap:7px;height:32px;padding:0 4px 0 10px;background:#d71920;cursor:grab;touch-action:none}',
+'.pip.moving .pipHead{cursor:grabbing}',
+'.pip.win .pipHead{cursor:default}',
+'.pipDot{flex:none;width:8px;height:8px;border-radius:50%;background:#fff;animation:pipBlink 1.6s infinite}',
+'@keyframes pipBlink{50%{opacity:.35}}',
+'.pipTitle{flex:1;min-width:0;font-weight:700;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+'.pipIco{flex:none;width:30px;height:26px;padding:0;border:0;border-radius:7px;background:rgba(255,255,255,.2);color:#fff;font-size:15px;line-height:1;cursor:pointer}',
+'.pipIco:hover{background:rgba(255,255,255,.36)}',
+'.pipGrid{flex:1;min-height:0;display:grid;grid-auto-rows:minmax(0,1fr);gap:3px;padding:3px}',
+'.ptile{position:relative;min-width:0;min-height:0;overflow:hidden;border-radius:8px;background:#2a3446;outline:2px solid transparent;outline-offset:-2px}',
+'.ptile.speaking{outline-color:#22c55e}',
+'.ptile.sharing{order:-1}',
+'.ptile video{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}',
+'.ptile.sharing video{object-fit:contain;background:#0f1622}',
+'.ptile.mirror video{transform:scaleX(-1)}',
+'.pav{position:absolute;left:0;top:0;right:0;bottom:0;display:none;align-items:center;justify-content:center;background:#2a3446}',
+'.ptile.camoff .pav{display:flex}',
+'.pav span{width:34%;max-width:64px;aspect-ratio:1;border-radius:50%;background:#d71920;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px}',
+'.plb{position:absolute;left:4px;bottom:4px;max-width:calc(100% - 8px);background:rgba(15,22,34,.72);color:#fff;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}',
+'.ptile.micon .plb{background:rgba(15,122,55,.9)}',
+'.pipBar{flex:none;display:flex;flex-wrap:wrap;gap:5px;padding:5px 24px 6px 6px;background:#111827}',
+'.pip.win .pipBar{padding-right:6px}',
+'.pipB{flex:1 1 auto;min-height:32px;padding:0 9px;border:0;border-radius:9px;background:rgba(255,255,255,.15);color:#fff;font-family:inherit;font-size:11.5px;font-weight:700;line-height:1;white-space:nowrap;cursor:pointer;touch-action:manipulation}',
+'.pipB:hover{background:rgba(255,255,255,.26)}',
+'.pipB.mic{touch-action:none;-webkit-touch-callout:none;box-shadow:inset 0 0 0 calc(var(--lv,0) * 3px) rgba(34,197,94,.75)}',
+'.pipB.mic.live{background:#16a34a}',
+'.pipB.stop{background:#d71920}',
+'.pipB.stop:hover{background:#b5121a}',
+'.pipB:focus-visible,.pipIco:focus-visible{outline:2px solid #60a5fa;outline-offset:1px}',
+'.pipRs{position:absolute;right:0;bottom:0;width:22px;height:22px;cursor:nwse-resize;touch-action:none;background:linear-gradient(135deg,transparent 0 50%,rgba(255,255,255,.8) 50% 58%,transparent 58% 68%,rgba(255,255,255,.8) 68% 76%,transparent 76%)}',
+'.pip.win .pipRs{display:none}'
+].join('\n');
+var PIP_HTML = '' +
+'<div class="pipHead" data-p="head"><i class="pipDot"></i><span class="pipTitle" data-p="title">IDECO Meet</span>' +
+ '<button class="pipIco" data-p="pop" type="button" title="Nổi trên mọi cửa sổ – vẫn thấy mọi người khi chuyển sang Excel hay ứng dụng khác" aria-label="Cho khung nổi trên mọi cửa sổ">🗗</button></div>' +
+'<div class="pipGrid" data-p="grid"></div>' +
+'<div class="pipBar">' +
+ '<button class="pipB mic" data-p="mic" type="button" title="Giữ để nói · bấm nhanh để bật / tắt hẳn micro">🎤 <span data-p="micTxt">Giữ để nói</span></button>' +
+ '<button class="pipB stop hidden" data-p="stop" type="button">⏹ Dừng chia sẻ</button>' +
+ '<button class="pipB" data-p="open" type="button">↩ Mở lại cuộc họp</button>' +
+'</div>' +
+'<div class="pipRs" data-p="rs" title="Kéo để phóng to / thu nhỏ"></div>';
 
 var CSS = [
 ':host{all:initial}',
@@ -167,7 +276,15 @@ var CSS = [
 '.tile.dragging{transition:border-color .15s;cursor:grabbing;box-shadow:0 14px 34px rgba(26,34,50,.25)}',
 '.tile.speaking{border-color:#16a34a;box-shadow:0 0 0 3px rgba(22,163,74,.3),0 6px 20px rgba(26,34,50,.14)}',
 '.tile video{width:100%;height:100%;object-fit:cover;display:block;background:#dfe4ec;pointer-events:none}',
-'.tile.sharing video{object-fit:contain;background:#1a2232}',
+'.tile.sharing video{object-fit:contain;background:#1a2232;transform-origin:0 0;will-change:transform}',
+'.tile.focus{border-width:0;border-radius:10px;cursor:default;background:#1a2232}',
+'.tile.zoomed{cursor:grab}',
+'.tile:fullscreen{border:0;border-radius:0;background:#000}',
+'.tile:fullscreen .rs{display:none}',
+'.tile.selfshare .avatar{display:flex;background:#1a2232}',
+'.tile.selfshare .avatar span{width:auto;max-width:none;aspect-ratio:auto;border-radius:10px;background:transparent;font-size:clamp(12px,2.2vw,16px);padding:0 10px;text-align:center}',
+'.zoomHint{position:absolute;right:8px;bottom:8px;background:rgba(26,34,50,.75);color:#fff;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:7px;pointer-events:none;display:none}',
+'.tile.zoomed .zoomHint{display:block}',
 '.tile .avatar{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:var(--soft);pointer-events:none}',
 '.tile.camoff .avatar{display:flex}',
 '.tile .avatar span{width:30%;max-width:96px;aspect-ratio:1;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:clamp(16px,3.4vw,38px);font-weight:800}',
@@ -193,7 +310,9 @@ var CSS = [
 '.pttBtn.live{background:var(--red);color:#fff;box-shadow:0 0 0 calc(4px + var(--lv,0) * 22px) rgba(215,25,32,.25)}',
 '.pttTxt{font-size:11.5px;font-weight:700;color:var(--muted);white-space:nowrap}',
 '.pttTxt.live{color:var(--red)}',
-'@media(max-width:560px){.ctl{width:60px;font-size:10px;padding:7px 2px}.ctl i{font-size:19px}.pttBtn{width:62px;height:62px;font-size:25px}.top .btn span{display:none}.top .brand .meet{display:none}.top .btn.sm{padding:7px 9px}}',
+'@media(max-width:560px){.bar{gap:4px;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}.ctl{width:52px;font-size:9.5px;padding:5px 2px;gap:2px;border-radius:10px}.ctl i{font-size:17px}.ptt{gap:2px;margin:0 2px}.pttBtn{width:50px;height:50px;font-size:20px;border-width:2px}.pttTxt{font-size:9.5px}.top{padding:5px 8px;padding-top:calc(5px + env(safe-area-inset-top,0px));gap:4px}.top .brand .ideco{font-size:17px}.top .info{font-size:12px}.top .btn span{display:none}.top .brand .meet{display:none}.top .btn.sm{padding:6px 8px;font-size:12px}.tile .label{font-size:11px;padding:2px 8px}.wait{font-size:13px;padding:10px}}',
+'@media(max-height:500px){.bar{gap:6px;padding:4px 8px calc(4px + env(safe-area-inset-bottom,0px))}.ctl{width:46px;padding:4px 2px}.ctl span,.pttTxt{display:none}.pttBtn{width:42px;height:42px;font-size:18px;border-width:2px}.top{padding:3px 8px}.top .brand .ideco{font-size:16px}}',
+'.ov.imm .top,.ov.imm .bar{display:none}',
 /* hộp cài đặt, thông báo */
 '.setModal{position:absolute;inset:0;background:rgba(26,34,50,.35);display:flex;align-items:flex-end;justify-content:center;z-index:5;padding:12px}',
 '.mcard{width:100%;max-width:470px;max-height:86%;overflow:auto;background:#fff;border-radius:18px;padding:16px 18px 20px;box-shadow:0 20px 60px rgba(26,34,50,.25)}',
@@ -204,7 +323,74 @@ var CSS = [
 '.soundBar button{background:var(--red);color:#fff;border:0;padding:12px 18px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(215,25,32,.35)}',
 '.srcVideo{position:fixed;left:0;top:0;width:2px;height:2px;opacity:0;pointer-events:none}',
 '.vcToast{position:fixed;left:50%;top:64px;transform:translateX(-50%);background:rgba(26,34,50,.92);color:#fff;padding:9px 16px;border-radius:10px;font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;opacity:0;transition:opacity .25s;pointer-events:none;z-index:' + Z + ';max-width:92vw;text-align:center}',
-'.vcToast.show{opacity:1}'
+'.vcToast.show{opacity:1}',
+/* chat nhóm + popup nhấp nháy */
+'.vcBtn.alert{animation:vcAlert .7s infinite;opacity:1}',
+'@keyframes vcAlert{0%,100%{background:' + BTN_COLOR + ';box-shadow:0 0 0 0 rgba(215,25,32,.7);transform:scale(1)}50%{background:#f59e0b;box-shadow:0 0 0 12px rgba(245,158,11,0);transform:scale(1.12)}}',
+'.chatBtn{pointer-events:auto;position:fixed;right:' + (BTN_RIGHT + 106) + 'px;bottom:calc(' + BTN_BOTTOM + 'px + env(safe-area-inset-bottom,0px));width:32px;height:32px;padding:0;display:flex;align-items:center;justify-content:center;border:1px solid #ffffff66;border-radius:50%;background:#1a2232;color:#fff;font-size:14px;line-height:1;box-shadow:0 2px 10px rgba(26,34,50,.28);cursor:pointer;touch-action:manipulation;opacity:.94;z-index:' + Z + '}',
+'.chatBtn:hover{opacity:1;filter:brightness(1.25)}',
+'.chatBtn:focus-visible{outline:3px solid #60a5fa;outline-offset:2px}',
+'.chatBtn .badge,.cbadge{position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;border-radius:9px;background:#d71920;color:#fff;font:700 10.5px/14px system-ui,Arial,sans-serif;text-align:center;padding:0 4px;border:2px solid #fff}',
+'.chatBtn.under,.chat.under{display:none}',
+'@media(max-width:600px),(max-height:480px){.chatBtn{width:36px;height:36px;font-size:15px}}',
+'.msgPop{pointer-events:auto;position:fixed;right:' + BTN_RIGHT + 'px;top:calc(76px + env(safe-area-inset-top,0px));width:min(400px,calc(100vw - 24px));max-height:calc(100dvh - 100px);overflow:auto;box-sizing:border-box;background:#fff;color:#1a2232;border:2px solid #d71920;border-radius:14px;padding:9px 12px 11px;box-shadow:0 12px 34px rgba(26,34,50,.3);font:13px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;z-index:' + Z + ';animation:msgBlink 1s 3}',
+'@keyframes msgBlink{0%,100%{border-color:#d71920;background:#fff;box-shadow:0 12px 34px rgba(26,34,50,.3),0 0 0 0 rgba(215,25,32,.6)}50%{border-color:#f59e0b;background:#ffedd5;box-shadow:0 12px 34px rgba(26,34,50,.3),0 0 0 14px rgba(215,25,32,0)}}',
+'.msgPop::after{display:none;content:"";position:absolute;right:36px;bottom:-9px;width:14px;height:14px;background:inherit;border-right:2px solid;border-bottom:2px solid;border-color:inherit;transform:rotate(45deg)}',
+'.msgPop .mh{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#b5121a;margin-bottom:2px}',
+'.msgPop .mh span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+'.msgPop .mh button{flex:none;border:0;background:#eef1f6;color:#667189;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:12px;padding:0}',
+'.msgPop .mt{font-size:16px;line-height:1.5;font-weight:600;word-break:break-word;white-space:pre-wrap;max-height:min(45dvh,300px);overflow:auto}',
+'.msgPop .mb{display:flex;gap:8px;margin-top:9px}',
+'.msgPop .mb button{border:0;border-radius:8px;padding:7px 12px;cursor:pointer;font-weight:700;font-size:12.5px}',
+'.msgPop .go{background:' + BTN_COLOR + ';color:#fff;flex:1}',
+'.msgPop .re{background:#1a2232;color:#fff;flex:1}',
+'.chat{pointer-events:auto;position:fixed;right:' + BTN_RIGHT + 'px;bottom:calc(' + (BTN_BOTTOM + 44) + 'px + env(safe-area-inset-bottom,0px));width:min(340px,calc(100vw - 24px));height:min(470px,calc(100dvh - ' + (BTN_BOTTOM + 64) + 'px));display:flex;flex-direction:column;background:#fff;color:#1a2232;border:1px solid #e1e6ee;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(26,34,50,.32);font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;z-index:' + Z + ';-webkit-tap-highlight-color:transparent}',
+'.chatHd{flex:none;display:flex;align-items:center;gap:8px;padding:8px 8px 8px 14px;background:#d71920;color:#fff;font-weight:700}',
+'.chatHd small{font-weight:500;font-size:11.5px;opacity:.92}',
+'.chatHd .sp{flex:1}',
+'.chatHd button{flex:none;border:0;background:rgba(255,255,255,.22);color:#fff;width:30px;height:28px;border-radius:8px;cursor:pointer;font-size:13px;padding:0}',
+'.chatLs{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:10px;background:#f3f5f9;display:flex;flex-direction:column;gap:7px}',
+'.cm{max-width:86%;align-self:flex-start;background:#fff;border:1px solid #e1e6ee;border-radius:12px 12px 12px 4px;padding:5px 10px 6px}',
+'.cm.me{align-self:flex-end;background:#fdecec;border-color:#f5c2c4;border-radius:12px 12px 4px 12px}',
+'.cm .who{font-size:11px;font-weight:700;color:#667189}',
+'.cm.me .who{color:#b5121a}',
+'.cm .tx{font-size:14px;white-space:pre-wrap;word-break:break-word}',
+'.chatEmpty{margin:auto;text-align:center;color:#667189;font-size:13px;padding:10px}',
+'.chatErr{flex:none;background:#fff7ed;color:#9a3412;font-size:12px;padding:6px 12px;border-top:1px solid #fed7aa}',
+'.chatFt{flex:none;display:flex;flex-direction:column;gap:6px;padding:8px;border-top:1px solid #e1e6ee;background:#fff}',
+'.chatFt .row{display:flex;gap:6px}',
+'.chatFt input[type=text]{flex:1;min-width:0;width:auto;padding:9px 11px}',
+'.chatFt .send{flex:none;border:0;border-radius:10px;background:#d71920;color:#fff;font-weight:700;padding:0 14px;cursor:pointer}',
+'.chatFt .send:disabled{opacity:.55;cursor:wait}',
+'.chatFt .chip{align-self:flex-start;border:1px solid #f5c2c4;background:#fdecec;color:#b5121a;border-radius:999px;padding:4px 11px;font-size:12px;font-weight:600;cursor:pointer}',
+'.top .btn{position:relative}',
+'.chatCf{flex:none;display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:#fff7ed;color:#9a3412;font-size:12.5px;font-weight:600;padding:7px 10px;border-top:1px solid #fed7aa}',
+'.chatCf button{border:0;border-radius:8px;padding:5px 10px;font-weight:700;font-size:12px;cursor:pointer}',
+'.chatCf .y{background:#d71920;color:#fff;margin-left:auto}',
+'.chatCf .n{background:#eef1f6;color:#667189}',
+'.chatTy{flex:none;padding:5px 12px;font-size:12.5px;color:#b5121a;background:#fff;border-top:1px solid #e1e6ee;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:typBlink .9s infinite}',
+'@keyframes typBlink{0%,100%{opacity:1}50%{opacity:.35}}',
+'.chatBtn.typing,.top .btn.typing{animation:typBtn .8s infinite}',
+'@keyframes typBtn{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.75)}50%{box-shadow:0 0 0 7px rgba(245,158,11,0);border-color:#f59e0b}}',
+'.typChip{pointer-events:auto;position:fixed;right:' + (BTN_RIGHT + 146) + 'px;bottom:calc(' + (BTN_BOTTOM + 1) + 'px + env(safe-area-inset-bottom,0px));height:30px;max-width:min(330px,calc(100vw - 170px));background:#1a2232;color:#fff;border:0;border-radius:12px;padding:6px 11px;box-shadow:0 8px 22px rgba(26,34,50,.3);font:600 12.5px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;z-index:' + Z + ';animation:typBlink .9s infinite}',
+'.typChip.under{display:none}',
+/* mật khẩu */
+'.pwRow{display:flex;gap:6px;margin-top:8px}',
+'.pwRow input{flex:1;min-width:0;width:auto;padding:11px 12px;border-radius:10px;border:1px solid #e1e6ee;background:#fff;color:#1a2232;outline:none;font-size:16px}',
+'.pwRow input:focus{border-color:#d71920}',
+'.eye{flex:none;width:46px;border:1px solid #e1e6ee;background:#fff;border-radius:10px;cursor:pointer;font-size:17px;padding:0}',
+'.pwBox .btn{margin-top:8px;font-weight:700}',
+'.lock{pointer-events:auto;position:fixed;inset:0;z-index:' + Z + ';background:rgba(26,34,50,.55);display:flex;align-items:center;justify-content:center;padding:12px;font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#1a2232}',
+'.lockCard{position:relative;width:100%;max-width:400px;background:#fff;border-radius:20px;padding:22px 20px 18px;box-shadow:0 20px 60px rgba(26,34,50,.35)}',
+'.lock .brand .ideco{color:#d71920}',
+'.lock .brand .meet{color:#667189}',
+'.lockCard .lx{position:absolute;right:12px;top:12px;border:0;background:#eef1f6;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:15px}',
+'.lockCard .lt{font-weight:700;font-size:16px;margin-top:12px}',
+'.lockCard .lgo{display:block;width:100%;margin-top:12px;background:#d71920;border:0;color:#fff;font-weight:700;font-size:17px;padding:13px;border-radius:10px;cursor:pointer}',
+'.lockCard .lgo:disabled{opacity:.6;cursor:wait}',
+'.lockCard .lerr{color:#b5121a;font-size:13.5px;min-height:19px;margin-top:8px}',
+'.lockCard .lnote{color:#667189;font-size:12.5px}',
+PIP_CSS
 ].join('\n');
 
 var HTML = '' +
@@ -216,11 +402,12 @@ var HTML = '' +
  '<div class="preview mirror" data-r="pvBox"><video data-r="pvVideo" muted playsinline autoplay></video>' +
   '<div class="pvMsg" data-r="pvMsg">Đang mở camera và micro…<br>Hãy bấm <b>&nbsp;Cho phép&nbsp;</b> khi trình duyệt hỏi.</div>' +
   '<canvas class="wave"></canvas></div>' +
- '<div class="note">🎤 Nói thử: sóng âm đỏ nhảy theo giọng là micro đã hoạt động.</div>' +
+ '<div class="note">🎤 Nói thử: sóng âm đỏ nhảy theo giọng là micro đã hoạt động. 🎧 Đeo tai nghe để nghe rõ, không vọng tiếng.</div>' +
  '<label class="f">Tên của bạn</label>' +
  '<input data-r="inName" type="text" maxlength="30" placeholder="Ví dụ: Huyền – Kế toán" autocomplete="name">' +
  '<label class="chk"><input type="checkbox" data-r="chkMicOn"> Vào họp với micro bật sẵn <small>(mặc định: giữ nút để nói)</small></label>' +
  '<button class="btn primary" data-r="btnJoin" type="button">Vào họp</button>' +
+ '<button class="btn" data-r="btnJoinInvite" type="button" style="display:block;width:100%;margin-top:8px;font-weight:700">📣 Mở cuộc họp & mời mọi người</button>' +
  '<div class="lmsg" data-r="lobbyMsg"></div>' +
  '<details><summary>⚙️ Chọn camera, micro, loa và phông nền</summary><div data-r="setSlotLobby">' +
   '<div class="settings" data-r="settings">' +
@@ -241,6 +428,11 @@ var HTML = '' +
    '</div>' +
    '<label class="chk"><input type="checkbox" data-r="chkBright"> ✨ Làm sáng và đẹp hình <small data-r="brightNote"></small></label>' +
    '<label class="chk"><input type="checkbox" data-r="chkBeep"> 📻 Âm báo bộ đàm khi bắt đầu / kết thúc nói</label>' +
+   '<label class="chk"><input type="checkbox" data-r="chkDuck"> 🎧 Chống vọng tiếng <small>(tự giảm tiếng người khác khi bạn đang nói; tắt nếu đeo tai nghe)</small></label>' +
+   '<div class="pwBox' + (REQUIRE_PASS ? '' : ' hidden') + '" data-r="pwBox"><label class="f">🔒 Đổi mật khẩu vào ứng dụng</label>' +
+    '<div class="pwRow"><input type="password" data-r="pwAdmin" placeholder="Mật khẩu quản trị" autocomplete="off"><button class="eye" type="button" aria-label="Hiện mật khẩu">👁</button></div>' +
+    '<div class="pwRow"><input type="password" data-r="pwNew" placeholder="Mật khẩu mới (từ 6 ký tự)" autocomplete="new-password"><button class="eye" type="button" aria-label="Hiện mật khẩu">👁</button></div>' +
+    '<button class="btn sm" data-r="pwSave" type="button">💾 Lưu lên Firebase để áp dụng</button><div class="note" data-r="pwMsg"></div></div>' +
   '</div>' +
  '</div></details>' +
 '</div></div>' +
@@ -249,13 +441,14 @@ var HTML = '' +
   '<div class="brand"><span class="ideco">IDECO</span><span class="meet">Meet</span></div>' +
   '<span class="info"><span data-r="count">1</span> người</span><span class="sp"></span>' +
   '<button class="btn sm hidden" data-r="btnFlip" type="button" title="Đổi camera trước / sau">🔄 <span>Đổi cam</span></button>' +
-  '<button class="btn sm" data-r="btnInvite" type="button" title="Hiện thông báo mời họp trên ERP của mọi người">📣 <span>Mời</span></button>' +
+  '<button class="btn sm" data-r="btnChat" type="button" title="Chat nhóm – nhắn tin cho mọi người đang mở ERP">💬 <span>Chat</span><b class="cbadge hidden" data-r="chatBadge"></b></button>' +
+  '<button class="btn sm" data-r="btnInvite" type="button" title="Viết lời mời họp – hiện popup nhấp nháy trên ERP của mọi người">📣 <span>Mời</span></button>' +
   '<button class="btn sm" data-r="btnLayout" type="button" title="Xếp lại các khung video">⊞ <span>Xếp lại</span></button>' +
   '<button class="btn sm" data-r="btnMin" type="button" title="Thu nhỏ để làm việc, cuộc họp vẫn tiếp tục">▁ <span>Thu nhỏ</span></button>' +
  '</div>' +
  '<div class="stage" data-r="stage">' +
   '<div class="wait hidden" data-r="wait"><b class="dots">⏳ Đang chờ đồng nghiệp vào họp</b>' +
-   'Bấm để hiện thông báo mời họp trên ERP của mọi người.<br>' +
+   'Bấm để viết lời mời – ERP của mọi người sẽ hiện thông báo nhấp nháy.<br>' +
    '<button class="btn sm" data-r="btnInvite2" type="button">📣 Mời mọi người vào họp</button>' +
    '<small data-r="waitNote">Có người vào sẽ có tiếng báo và tên hiện lên màn hình.</small></div>' +
  '</div>' +
@@ -274,6 +467,8 @@ var HTML = '' +
 
 /* ======================= NÚT + KHUNG CHỨA ======================= */
 var host = null, sroot = null, btn = null, badge = null, bubble = null, toastEl = null, app = null, toastT = null, menuOpen = false;
+var chatBtn = null, chatBadgeEl = null, msgPop = null, chatEl = null, chatLs = null, chatIn = null, chatName = null, chatSendBtn = null, chatErr = null;
+var chatCf = null, chatTy = null, chatSt = null, typChip = null, lockEl = null, lockIn = null, lockGo = null, lockErr = null;
 
 function toast(msg){
   if(!toastEl) return;
@@ -286,6 +481,7 @@ function setBtn(state){
   if(state !== 'mini') btn.classList.remove('talk');
   btn.querySelector('span').textContent = state === 'mini' ? '● Đang họp' : BTN_TEXT;
   btn.setAttribute('aria-label', state === 'mini' ? 'Mở lại cuộc họp đang diễn ra' : 'Mở họp video nội bộ');
+  placeChatBtn();
   renderPresence();
 }
 /* Ẩn nút khi menu "Ứng dụng" đang mở (menu bung lên đúng chỗ nút) */
@@ -293,10 +489,10 @@ function watchAppsMenu(tries){
   var h = document.getElementById('ideco-compact-v14');
   var l = h && h.shadowRoot && h.shadowRoot.querySelector('.launch');
   if(!l){ if((tries || 0) < 40) setTimeout(function(){ watchAppsMenu((tries || 0) + 1); }, 500); return; }
-  var f = function(){ menuOpen = l.getAttribute('aria-expanded') === 'true'; btn.classList.toggle('under', menuOpen); bubble.classList.toggle('under', menuOpen); };
+  var f = function(){ menuOpen = l.getAttribute('aria-expanded') === 'true'; [btn, bubble, chatBtn, chatEl, typChip].forEach(function(e){ if(e) e.classList.toggle('under', menuOpen); }); };
   new MutationObserver(f).observe(l, {attributes:true, attributeFilter:['aria-expanded']}); f();
 }
-function openMeet(){ hideBubble(); if(app) app.restore(); else app = createApp(); }
+function openMeet(opts){ withGate(function(){ hideBubble(); if(app) app.restore(); else app = createApp(opts || {}); }); }
 function boot(){
   if(host || !document.body) return;
   host = document.createElement('div');
@@ -306,15 +502,38 @@ function boot(){
   sroot = host.attachShadow({mode:'open'});
   sroot.innerHTML = '<style>' + CSS + '</style>' +
     '<button class="vcBtn" type="button" aria-label="Mở họp video nội bộ" title="Họp video nội bộ"><i>📹</i><span>' + esc(BTN_TEXT) + '</span><b class="badge hidden"></b></button>' +
+    '<button class="chatBtn' + (CHAT_DB ? '' : ' hidden') + '" type="button" aria-label="Mở khung chat nhóm" title="Chat nhóm – nhắn tin, mời họp">💬<b class="badge hidden"></b></button>' +
     '<div class="bubble hidden" role="status"><div class="bt"></div><div class="bb"><button class="go" type="button">Vào họp</button><button class="x" type="button" aria-label="Ẩn">Để sau</button></div></div>' +
+    '<div class="msgPop hidden" role="alert" aria-live="assertive" aria-atomic="true"><div class="mh">💬 <span class="mw"></span><button class="x" type="button" aria-label="Đóng thông báo">✕</button></div><div class="mt"></div>' +
+     '<div class="mb"><button class="go" type="button">Vào họp</button><button class="re" type="button">Trả lời</button></div></div>' +
+    '<div class="chat hidden" role="dialog" aria-label="Chat nhóm IDECO Meet">' +
+     '<div class="chatHd">💬 Chat nhóm <small class="cs"></small><span class="sp"></span>' +
+      '<button class="rf" type="button" title="Tải lại tin nhắn" aria-label="Tải lại tin nhắn">🔄</button>' +
+      '<button class="cl" type="button" title="Xoá lịch sử chat" aria-label="Xoá lịch sử chat">🗑</button>' +
+      '<button class="x" type="button" aria-label="Đóng khung chat">✕</button></div>' +
+     '<div class="chatLs"></div><div class="chatErr hidden"></div>' +
+     '<div class="chatCf hidden">Xoá toàn bộ tin nhắn trên MỌI máy?<button class="y" type="button">Xoá hết</button><button class="n" type="button">Không</button></div>' +
+     '<div class="chatTy hidden"></div>' +
+     '<div class="chatFt"><button class="chip" type="button">📣 Soạn lời mời họp</button>' +
+      '<input class="cn hidden" type="text" maxlength="30" placeholder="Tên của bạn (ví dụ: Huyền – Kế toán)" autocomplete="name">' +
+      '<div class="row"><input class="ci" type="text" maxlength="300" placeholder="Viết tin nhắn… ví dụ: Mời Hương họp online lúc 9h10" autocomplete="off"><button class="send" type="button">Gửi</button></div></div>' +
+    '</div>' +
+    '<button class="typChip hidden" type="button" title="Mở khung chat"></button>' +
+    '<div class="lock hidden" role="dialog" aria-label="Nhập mật khẩu"><div class="lockCard"><button class="lx" type="button" aria-label="Đóng">✕</button>' +
+     '<div class="brand"><span class="ideco">IDECO</span><span class="meet">Meet</span></div>' +
+     '<div class="lt">🔒 Nhập mật khẩu để vào ứng dụng</div>' +
+     '<div class="pwRow"><input class="lp" type="password" placeholder="Mật khẩu" autocomplete="current-password"><button class="eye" type="button" aria-label="Hiện mật khẩu">👁</button></div>' +
+     '<button class="lgo" type="button">Vào ứng dụng</button><div class="lerr"></div>' +
+     '<div class="lnote">Mật khẩu được lưu trên máy này – lần sau không cần nhập lại.</div></div></div>' +
     '<div class="vcToast" role="status"></div>';
   btn = sroot.querySelector('.vcBtn');
   badge = btn.querySelector('.badge');
   bubble = sroot.querySelector('.bubble');
   toastEl = sroot.querySelector('.vcToast');
-  btn.onclick = openMeet;
-  bubble.querySelector('.go').onclick = openMeet;
+  btn.onclick = function(){ openMeet(); };
+  bubble.querySelector('.go').onclick = function(){ openMeet({ auto:true }); };   // từ thông báo: đã có tên thì vào thẳng
   bubble.querySelector('.x').onclick = function(){ hideBubble(); pres.dismissed = true; };
+  chatBoot();
   watchAppsMenu(0);
   startPresencePoll();
 }
@@ -382,7 +601,7 @@ function renderPresence(){
   btn.classList.toggle('active', active && !inMeet && !btn.classList.contains('mini'));
   btn.title = active ? (n + ' người đang họp: ' + namesText(pres.list)) : 'Họp video nội bộ';
   if(!active){ pres.wasActive = false; pres.dismissed = false; hideBubble(); return; }
-  if(app){ hideBubble(); return; }                       // đang mở khung họp thì không cần nhắc
+  if(app || chatBusy()){ hideBubble(); return; }         // đang mở khung họp / đang có popup tin nhắn thì không cần nhắc
   var call = pres.call, fresh = call && call.key !== pres.lastCall && call.name !== (store('name') || '');
   if(fresh){
     pres.lastCall = call.key; store('lastCall', call.key); pres.dismissed = false;
@@ -395,11 +614,385 @@ function renderPresence(){
   pres.wasActive = true;
 }
 
+/* ======================= CHAT NHÓM + POPUP NHẤP NHÁY (Firebase thời gian thực) ======================= */
+/* Mỗi tin = 1 dòng trong  CHAT_NODE/ROOM  (tên, nội dung, giờ máy chủ). Mọi máy đang mở ERP nghe luồng thay đổi
+   của Firebase (EventSource); nếu mạng chặn luồng thì tự chuyển sang hỏi lại 4 giây/lần. */
+var chat = { on:!!CHAT_DB, msgs:{}, keys:[], ready:false, open:false, unread:0, seen:store('chatSeen') || '', cid:store('cid') || '', tid:Math.random().toString(36).slice(2, 10) + Date.now().toString(36), other:{},
+             es:null, fails:0, pollT:null, pollN:0, popKey:'', denied:false, mode:'off', sending:false, listeners:[] };
+if(!chat.cid){ chat.cid = Math.random().toString(36).slice(2, 10) + Date.now().toString(36); store('cid', chat.cid); }
+function chatUrl(q){ return CHAT_DB.replace(/\/+$/, '') + '/' + CHAT_NODE + '/' + ROOM + '.json' + (q || ''); }
+function chatQuery(){ return '?orderBy=%22%24key%22&limitToLast=' + CHAT_KEEP; }
+function chatBusy(){ return !!(msgPop && !msgPop.classList.contains('hidden')) || chat.open; }
+function chatMine(k){ var m = chat.msgs[k]; return !!m && m.cid === chat.cid; }                 // tin gửi từ trình duyệt này (hiện chữ "Bạn")
+function chatSelf(k){ return chatMine(k) && !chat.other[k]; }                                    // …và không phải vừa đến từ một thẻ khác → không cần báo
+var titleT = null, titleOld = '';
+function titleBlink(who){                                   // tiêu đề thẻ cũng nháy để thấy khi đang ở thẻ khác
+  if(!who){ if(titleT){ clearInterval(titleT); titleT = null; document.title = titleOld; } return; }
+  if(titleT) return;
+  titleOld = document.title; var n = 0;
+  titleT = setInterval(function(){ document.title = (n++ % 2) ? titleOld : '🔔 ' + who + ' nhắn tin…'; }, 900);
+}
+function chatTime(ts){
+  var d = new Date(+ts || Date.now()), n = new Date(), p = function(x){ return (x < 10 ? '0' : '') + x; };
+  var hm = p(d.getHours()) + ':' + p(d.getMinutes());
+  return d.toDateString() === n.toDateString() ? hm : p(d.getDate()) + '/' + p(d.getMonth() + 1) + ' ' + hm;
+}
+function placeChatBtn(){
+  if(!chatBtn || !btn) return;
+  var r = BTN_RIGHT + (btn.offsetWidth || 100) + 6;
+  chatBtn.style.right = r + 'px';
+  if(typChip) typChip.style.right = (r + (chatBtn.offsetWidth || 32) + 8) + 'px';   // dòng "đang nhập" nằm bên trái nút chat, không che popup
+}
+function chatBoot(){
+  chatBtn = sroot.querySelector('.chatBtn'); chatBadgeEl = chatBtn.querySelector('.badge');
+  msgPop = sroot.querySelector('.msgPop'); chatEl = sroot.querySelector('.chat');
+  chatLs = chatEl.querySelector('.chatLs'); chatIn = chatEl.querySelector('.ci'); chatName = chatEl.querySelector('.cn');
+  chatSendBtn = chatEl.querySelector('.send'); chatErr = chatEl.querySelector('.chatErr');
+  chatCf = chatEl.querySelector('.chatCf'); chatTy = chatEl.querySelector('.chatTy'); chatSt = chatEl.querySelector('.cs'); typChip = sroot.querySelector('.typChip');
+  lockEl = sroot.querySelector('.lock'); lockIn = lockEl.querySelector('.lp'); lockGo = lockEl.querySelector('.lgo'); lockErr = lockEl.querySelector('.lerr');
+  bindEyes(lockEl);
+  lockGo.onclick = lockSubmit;
+  lockIn.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); lockSubmit(); } });
+  lockEl.querySelector('.lx').onclick = function(){ lockEl.classList.add('hidden'); gate.then = null; };
+  if(REQUIRE_PASS) gateLoad();
+  chatBtn.onclick = function(){ withGate(chatToggle); };
+  typChip.onclick = function(){ chatOpen(); };
+  chatEl.querySelector('.rf').onclick = chatRefresh;
+  chatEl.querySelector('.cl').onclick = function(){ chatCf.classList.toggle('hidden'); };
+  chatCf.querySelector('.n').onclick = function(){ chatCf.classList.add('hidden'); };
+  chatCf.querySelector('.y').onclick = chatClear;
+  chatIn.addEventListener('input', chatTypingPing);
+  chatIn.addEventListener('blur', function(){ setTimeout(function(){ if(!chatIn.value.trim()) chatTypingStop(); }, 200); });
+  window.addEventListener('pagehide', chatTypingStop);
+  chatEl.querySelector('.chatHd .x').onclick = chatClose;
+  chatEl.querySelector('.chip').onclick = function(){ chatCompose(chatInviteText()); };
+  chatSendBtn.onclick = chatSend;
+  chatIn.addEventListener('keydown', function(e){ if(e.key === 'Enter' && !e.isComposing){ e.preventDefault(); chatSend(); } });
+  chatName.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); chatIn.focus(); } });
+  msgPop.querySelector('.x').onclick = function(){ chatMarkSeen(); };
+  msgPop.querySelector('.re').onclick = function(){ chatOpen(); };
+  msgPop.querySelector('.go').onclick = function(){ chatMarkSeen(); openMeet({ auto:true }); };   // đã có tên thì vào thẳng
+  window.addEventListener('resize', placeChatBtn);
+  setTimeout(placeChatBtn, 0);
+  if(chat.on) setTimeout(function(){ gateLoad().then(function(){ if(unlocked()) chatConnect(); }); }, 1500 + Math.random() * 1500);   // không nối ngay lúc trang đang tải; trang có mật khẩu: chỉ nối sau khi mở khoá
+}
+function chatInviteText(){ var d = new Date(), m = d.getMinutes(); return 'Mời mọi người vào họp online lúc ' + d.getHours() + 'h' + (m < 10 ? '0' : '') + m; }
+/* ---- nhận dữ liệu ---- */
+function chatApply(path, data, isPatch){
+  var p = String(path || '/').replace(/^\/+/, '');
+  if(!p){
+    if(isPatch){ Object.keys(data || {}).forEach(function(k){ if(data[k] === null) delete chat.msgs[k]; else chat.msgs[k] = data[k]; }); }
+    else chat.msgs = (data && typeof data === 'object') ? data : {};
+  }else{
+    var seg = p.split('/'), id = seg[0];
+    if(seg.length === 1){
+      if(data === null) delete chat.msgs[id];
+      else if(isPatch && chat.msgs[id] && typeof data === 'object'){ Object.keys(data).forEach(function(k){ chat.msgs[id][k] = data[k]; }); }
+      else chat.msgs[id] = data;
+    }else{ if(!chat.msgs[id] || typeof chat.msgs[id] !== 'object') chat.msgs[id] = {}; chat.msgs[id][seg[1]] = data; }
+  }
+  chatChanged();
+}
+function chatConnect(){
+  typConnect();
+  if(!chat.on || chat.es) return;
+  if(typeof window.EventSource === 'function'){
+    try{
+      var es = new EventSource(chatUrl(chatQuery())); chat.es = es;
+      var on = function(patch){ return function(ev){
+        var d = null; try{ d = JSON.parse(ev.data); }catch(_){}
+        if(!d) return;
+        chat.fails = 0; chat.denied = false; chat.mode = 'live'; chatStopPoll();
+        chatApply(d.path, d.data, patch);
+      }; };
+      var drop = function(){ if(chat.es === es){ try{ es.close(); }catch(_){} chat.es = null; chatStartPoll(); } };
+      es.addEventListener('put', on(false));
+      es.addEventListener('patch', on(true));
+      es.addEventListener('cancel', drop);            // Firebase từ chối quyền đọc
+      es.addEventListener('auth_revoked', drop);
+      es.onerror = function(){ chat.fails++; if(es.readyState === 2 || chat.fails >= 3) drop(); };
+      return;
+    }catch(_){ chat.es = null; }
+  }
+  chatStartPoll();
+}
+function chatStopPoll(){ clearTimeout(chat.pollT); chat.pollT = null; chat.pollN = 0; }
+function chatStartPoll(){ if(chat.pollT || !chat.on) return; chat.mode = 'poll'; chat.pollN = 0; chatPoll(); }
+function chatPoll(){
+  clearTimeout(chat.pollT);
+  fetch(chatUrl(chatQuery()), { cache:'no-store' }).then(function(r){
+    if(r.status === 401 || r.status === 403){ chat.denied = true; throw new Error('denied'); }
+    if(!r.ok) throw new Error('http');
+    return r.json();
+  }).then(function(d){ chat.denied = false; chatApply('/', d, false); }, function(){ chatShowErr(); }).then(function(){
+    if(chat.es || !chat.on) return;
+    chat.pollN++;
+    if(chat.pollN >= 75){ chat.pollT = null; chat.fails = 0; chatConnect(); return; }   // ~5 phút: thử nối lại luồng thời gian thực
+    chat.pollT = setTimeout(chatPoll, chat.denied ? 30000 : (document.hidden ? 12000 : 4000));
+  });
+}
+function chatShowErr(){
+  if(!chatErr) return;
+  if(chatSt) chatSt.textContent = chat.denied ? '🔴 chưa có quyền' : chat.mode === 'live' ? '🟢 trực tuyến' : chat.mode === 'poll' ? '🟠 kết nối chậm' : '⚪ đang nối…';
+  chatErr.classList.toggle('hidden', !chat.denied);
+  if(chat.denied) chatErr.textContent = 'Firebase chưa cho phép đọc / ghi nút "' + CHAT_NODE + '" – cần mở quyền trong Rules của Realtime Database.';
+}
+function chatChanged(){
+  var keys = Object.keys(chat.msgs).filter(function(k){ var m = chat.msgs[k]; return m && typeof m === 'object' && typeof m.text === 'string' && m.text; }).sort();
+  var first = !chat.ready, old = chat.keys; chat.ready = true; chat.keys = keys;
+  var fresh = keys.filter(function(k){ return old.indexOf(k) < 0; });
+  fresh.forEach(function(k){
+    var m = chat.msgs[k]; delete typ.map[m.tid || m.cid];   // đã gửi xong thì hết "đang nhập"
+    if(!first && m.cid === chat.cid && m.tid && m.tid !== chat.tid) chat.other[k] = 1;   // cùng trình duyệt nhưng thẻ khác: vẫn báo
+  });
+  typRender();
+  chatShowErr();
+  chatRender(fresh.length > 0);
+  var last = null;
+  for(var i = keys.length - 1; i >= 0; i--){ if(!chatSelf(keys[i])){ last = keys[i]; break; } }
+  // Mỗi tin đến đều báo popup, kể cả khi khung chat đang mở.
+  chat.unread = keys.filter(function(k){ return k > chat.seen && !chatSelf(k); }).length;
+  if(last && last > chat.seen && last !== chat.popKey){
+    var m = chat.msgs[last], isNew = !first && fresh.indexOf(last) >= 0, age = Date.now() - (+m.ts || Date.now());
+    if(isNew || age < CHAT_POP_AGE) chatPop(last, isNew);
+  }
+  chatBadge();
+}
+function chatBadge(){
+  if(chatBadgeEl){ chatBadgeEl.textContent = chat.unread > 9 ? '9+' : chat.unread; chatBadgeEl.classList.toggle('hidden', !chat.unread); }
+  chat.listeners.forEach(function(f){ try{ f(); }catch(_){} });
+}
+/* ---- popup nhấp nháy trên nút Video call ---- */
+function chatPop(key, isNew){
+  var m = chat.msgs[key]; if(!m) return;
+  chat.popKey = key;
+  var who = String(m.name || 'Đồng nghiệp').slice(0, 30), text = String(m.text).slice(0, 300);
+  msgPop.querySelector('.mw').textContent = who + ' · ' + chatTime(m.ts);
+  msgPop.querySelector('.mt').textContent = text;
+  msgPop.querySelector('.go').textContent = (app && app.isJoined()) ? 'Mở cuộc họp' : 'Vào họp';
+  hideBubble();
+  // Khởi động lại hiệu ứng cho TỪNG tin mới, dù popup trước vẫn đang hiện.
+  msgPop.style.animation = 'none';
+  msgPop.classList.remove('hidden', 'under');
+  void msgPop.offsetWidth;
+  msgPop.style.animation = '';
+  btn.classList.add('alert'); titleBlink(''); titleBlink(who);
+  if(isNew) ring();
+}
+function chatPopHide(){ if(msgPop) msgPop.classList.add('hidden'); if(btn) btn.classList.remove('alert'); titleBlink(''); }
+function chatMarkSeen(){
+  var k = chat.keys[chat.keys.length - 1] || '';
+  if(k > chat.seen){ chat.seen = k; store('chatSeen', k); }
+  chat.unread = 0; chatPopHide(); chatBadge();
+}
+/* ---- khung chat ---- */
+function chatRender(stick){
+  if(!chat.open || !chatLs) return;
+  var near = chatLs.scrollHeight - chatLs.scrollTop - chatLs.clientHeight < 80;
+  if(!chat.keys.length){
+    chatLs.innerHTML = '<div class="chatEmpty">' + (chat.ready ? 'Chưa có tin nhắn.<br>Hãy viết lời mời, ví dụ:<br><b>Mời Hương họp online lúc 9h10</b>' : (chat.denied ? 'Chưa đọc được tin nhắn.' : 'Đang tải tin nhắn…')) + '</div>';
+    return;
+  }
+  chatLs.innerHTML = chat.keys.map(function(k){
+    var m = chat.msgs[k], me = chatMine(k);
+    return '<div class="cm' + (me ? ' me' : '') + '"><div class="who">' + esc(me ? 'Bạn' : String(m.name || 'Đồng nghiệp').slice(0, 30)) + ' · ' + chatTime(m.ts) + '</div><div class="tx">' + esc(String(m.text).slice(0, 300)) + '</div></div>';
+  }).join('');
+  if(stick || near) chatLs.scrollTop = chatLs.scrollHeight;
+}
+function chatOpen(){
+  if(!chat.on || !chatEl) return;
+  chat.open = true; hideBubble();
+  chatName.classList.toggle('hidden', !!(store('name') || '').trim());
+  chatEl.classList.remove('hidden');
+  chatRender(true); chatLs.scrollTop = chatLs.scrollHeight;
+  chatMarkSeen(); typRender();
+  if(!chat.es && !chat.pollT) chatConnect();
+  if(!IS_MOBILE) setTimeout(function(){ try{ (chatName.classList.contains('hidden') ? chatIn : chatName).focus(); }catch(_){} }, 30);
+}
+function chatClose(){ chat.open = false; if(chatEl) chatEl.classList.add('hidden'); if(chatCf) chatCf.classList.add('hidden'); chatTypingStop(); chatBadge(); typRender(); }
+function chatToggle(){ if(chat.open) chatClose(); else chatOpen(); }
+function chatCompose(text){                                 // mở khung chat với nội dung soạn sẵn (lời mời họp)
+  chatOpen(); if(!chat.open) return;
+  chatIn.value = text || '';
+  setTimeout(function(){ try{ chatIn.focus(); chatIn.setSelectionRange(chatIn.value.length, chatIn.value.length); }catch(_){} }, 40);
+}
+function chatSend(){
+  if(chat.sending || !chat.on) return;
+  var name = (store('name') || '').trim();
+  if(!name){
+    name = chatName.value.trim();
+    if(!name){ chatName.classList.remove('hidden'); chatName.focus(); toast('Hãy nhập tên của bạn trước khi gửi.'); return; }
+    name = name.slice(0, 30); store('name', name); chatName.classList.add('hidden');
+  }
+  var text = chatIn.value.replace(/\s+/g, ' ').trim().slice(0, 300);
+  if(!text){ chatIn.focus(); return; }
+  chat.sending = true; chatSendBtn.disabled = true;
+  fetch(chatUrl(), { method:'POST', headers:{'Content-Type':'application/json'}, cache:'no-store',
+    body:JSON.stringify({ name:name, text:text, cid:chat.cid, tid:chat.tid, ts:{'.sv':'timestamp'} }) }).then(function(r){
+    if(r.status === 401 || r.status === 403){ chat.denied = true; chatShowErr(); }
+    if(!r.ok) throw new Error('http');
+    return r.json();
+  }).then(function(d){
+    chatIn.value = ''; chatTypingStop();
+    if(d && d.name && !chat.msgs[d.name]){ chat.msgs[d.name] = { name:name, text:text, cid:chat.cid, tid:chat.tid, ts:Date.now() }; chatChanged(); }   // hiện ngay, không chờ vòng đọc
+    toast('Đã gửi – mọi máy đang mở ERP sẽ thấy thông báo nhấp nháy trên nút Video call.');
+    if(Math.random() < 0.15) chatTrim();
+  }, function(){
+    toast(chat.denied ? 'Firebase chưa cho phép ghi tin nhắn – cần mở quyền trong Rules.' : 'Chưa gửi được tin nhắn – kiểm tra mạng rồi thử lại.');
+  }).then(function(){ chat.sending = false; chatSendBtn.disabled = false; if(!IS_MOBILE) chatIn.focus(); });
+}
+/* ---- tải lại / xoá lịch sử ---- */
+function chatRefresh(){
+  if(!chat.on) return;
+  if(chat.es){ try{ chat.es.close(); }catch(_){} chat.es = null; }
+  if(typ.es){ try{ typ.es.close(); }catch(_){} typ.es = null; }
+  chatStopPoll(); chat.fails = 0; chat.mode = 'off'; chatShowErr();
+  fetch(chatUrl(chatQuery()), { cache:'no-store' }).then(function(r){
+    if(r.status === 401 || r.status === 403){ chat.denied = true; throw new Error('denied'); }
+    if(!r.ok) throw new Error('http');
+    return r.json();
+  }).then(function(d){ chat.denied = false; chatApply('/', d, false); chatRender(true); toast('Đã tải lại tin nhắn.'); }, function(){
+    chatShowErr(); toast(chat.denied ? 'Firebase chưa cho phép đọc tin nhắn – cần mở quyền trong Rules.' : 'Chưa tải lại được – kiểm tra mạng rồi thử lại.');
+  }).then(function(){ chatConnect(); });
+}
+function chatClear(){
+  chatCf.classList.add('hidden');
+  fetch(chatUrl(), { method:'DELETE' }).then(function(r){
+    if(!r.ok) throw new Error('http');
+    chat.msgs = {}; chatChanged(); chatRender(true);
+    toast('Đã xoá lịch sử chat trên mọi máy.');
+  }).catch(function(){ toast('Chưa xoá được – kiểm tra mạng hoặc quyền ghi Firebase.'); });
+}
+/* ---- "đang nhập": máy đang gõ ghi nhịp vào Firebase, máy khác thấy dòng nhấp nháy ---- */
+var typ = { es:null, map:{}, lastSent:0, active:false, sendT:null, idleT:null, t:null };
+function typUrl(sub){ return CHAT_DB.replace(/\/+$/, '') + '/' + CHAT_NODE + '_typing/' + ROOM + (sub ? '/' + sub : '') + '.json'; }
+function typConnect(){
+  if(!chat.on || !CHAT_TYPING || typ.es || typeof window.EventSource !== 'function') return;
+  try{
+    var es = new EventSource(typUrl()), first = true; typ.es = es;
+    var on = function(patch){ return function(ev){
+      var d = null; try{ d = JSON.parse(ev.data); }catch(_){}
+      if(!d) return;
+      typApply(d.path, d.data, patch, first); first = false;
+    }; };
+    es.addEventListener('put', on(false)); es.addEventListener('patch', on(true));
+    es.onerror = function(){ if(es.readyState === 2 && typ.es === es) typ.es = null; };
+  }catch(_){ typ.es = null; }
+}
+function typApply(path, data, isPatch, initial){
+  var p = String(path || '/').replace(/^\/+/, ''), now = Date.now();
+  var set = function(id, v){
+    if(id === chat.tid) return;
+    if(!v || typeof v !== 'object' || !v.name){ delete typ.map[id]; return; }
+    typ.map[id] = { name:String(v.name).slice(0, 30), text:typeof v.text === 'string' ? v.text.slice(0, 120) : '', at:initial ? 0 : now };   // dòng cũ còn sót lúc mới mở trang: bỏ qua
+  };
+  if(!p){
+    if(!isPatch) typ.map = {};
+    if(data && typeof data === 'object') Object.keys(data).forEach(function(k){ set(k, data[k]); });
+  }else{
+    var sg = p.split('/'), m = typ.map[sg[0]];
+    if(sg.length === 1) set(sg[0], data);
+    else if(m){ if(sg[1] === 'text') m.text = String(data == null ? '' : data).slice(0, 120); m.at = now; }
+  }
+  typRender();
+}
+function typRender(){
+  if(!typChip) return;
+  var now = Date.now(), act = Object.keys(typ.map).map(function(k){ return typ.map[k]; }).filter(function(m){ return now - m.at < 7000; });
+  var txt = '';
+  if(act.length){
+    var m = act[act.length - 1];
+    txt = '✍️ ' + (act.length > 1 ? act.length + ' người đang nhập…' : m.name + ' đang nhập' + (m.text ? ': ' + m.text : '…'));
+  }
+  chatTy.textContent = txt; chatTy.classList.toggle('hidden', !txt || !chat.open);
+  var outside = !!txt && !chat.open, inRoom = !!(app && app.isOpen());
+  typChip.textContent = txt; typChip.classList.toggle('hidden', !outside || inRoom);
+  chatBtn.classList.toggle('typing', outside);
+  if(chat.typing !== outside){ chat.typing = outside; chat.listeners.forEach(function(f){ try{ f(); }catch(_){} }); }
+  clearTimeout(typ.t); if(act.length) typ.t = setTimeout(typRender, 1000);
+}
+function chatTypingPing(){
+  if(!CHAT_TYPING || !chat.on) return;
+  var text = chatIn.value.replace(/\s+/g, ' ').trim();
+  if(!text){ chatTypingStop(); return; }
+  var now = Date.now();
+  if(now - typ.lastSent < 1200){ clearTimeout(typ.sendT); typ.sendT = setTimeout(chatTypingPing, 1250); return; }
+  typ.lastSent = now; typ.active = true;
+  var name = ((store('name') || '').trim() || chatName.value.trim() || 'Đồng nghiệp').slice(0, 30);
+  fetch(typUrl(chat.tid), { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ name:name, text:CHAT_TYPING_TEXT ? text.slice(0, 120) : '', ts:{'.sv':'timestamp'} }) }).catch(noop);
+  clearTimeout(typ.idleT); typ.idleT = setTimeout(chatTypingStop, 6000);   // ngừng gõ 6 giây → tự hết "đang nhập"
+}
+function chatTypingStop(){
+  clearTimeout(typ.sendT); clearTimeout(typ.idleT);
+  if(!typ.active) return;
+  typ.active = false; typ.lastSent = 0;
+  try{ fetch(typUrl(chat.tid), { method:'DELETE', keepalive:true }).catch(noop); }catch(_){}
+}
+/* ======================= MẬT KHẨU VÀO ỨNG DỤNG (chỉ trang website) ======================= */
+var gate = { cur:store('pwCur') || PASS_DEFAULT, p:null, done:!REQUIRE_PASS, then:null };
+function passUrl(){ return CHAT_DB.replace(/\/+$/, '') + '/' + PASS_NODE + '/pass.json'; }
+function gateLoad(force){                                   // đọc mật khẩu hiện hành (mã băm) từ Firebase
+  if(!REQUIRE_PASS) return Promise.resolve();
+  if(gate.p && !force) return gate.p;
+  var wait = new Promise(function(res){ setTimeout(res, 3500); });
+  var get = !CHAT_DB ? Promise.resolve() : fetch(passUrl(), { cache:'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).then(function(d){
+    if(d && typeof d.hash === 'string' && /^[0-9a-f]{64}$/.test(d.hash)){ gate.cur = d.hash; store('pwCur', d.hash); }
+  }).catch(noop);
+  gate.p = Promise.race([get, wait]).then(function(){ gate.done = true; });
+  return gate.p;
+}
+function unlocked(){ return !REQUIRE_PASS || store('pw') === gate.cur; }
+function withGate(fn){
+  if(!REQUIRE_PASS){ fn(); return; }
+  var go = function(){ if(unlocked()) fn(); else lockShow(fn); };
+  if(gate.done) go(); else gateLoad().then(go);
+}
+function lockShow(fn){
+  gate.then = fn; lockErr.textContent = ''; lockEl.classList.remove('hidden');
+  setTimeout(function(){ try{ lockIn.focus(); }catch(_){} }, 30);
+}
+function lockSubmit(){
+  var v = lockIn.value;
+  if(!v){ lockErr.textContent = 'Hãy nhập mật khẩu.'; lockIn.focus(); return; }
+  var h = hashPw(v);
+  var ok = function(){
+    store('pw', gate.cur);                                  // nhớ trên máy này: lần sau không hỏi lại
+    lockEl.classList.add('hidden'); lockIn.value = ''; lockErr.textContent = '';
+    var f = gate.then; gate.then = null;
+    if(chat.on) chatConnect();
+    if(f) f();
+  };
+  if(h === gate.cur){ ok(); return; }
+  lockGo.disabled = true;
+  gateLoad(true).then(function(){                           // có thể mật khẩu vừa được đổi: đọc lại rồi so
+    lockGo.disabled = false;
+    if(h === gate.cur) ok(); else{ lockErr.textContent = 'Mật khẩu chưa đúng.'; try{ lockIn.focus(); lockIn.select(); }catch(_){} }
+  });
+}
+function bindEyes(root){                                    // nút con mắt: hiện / ẩn mật khẩu
+  [].forEach.call(root.querySelectorAll('.eye'), function(b){
+    b.onclick = function(){
+      var i = b.previousElementSibling, show = i.type === 'password';
+      i.type = show ? 'text' : 'password'; b.textContent = show ? '🙈' : '👁';
+      b.setAttribute('aria-label', show ? 'Ẩn mật khẩu' : 'Hiện mật khẩu');
+    };
+  });
+}
+function chatTrim(){                                        // giữ tối đa CHAT_MAX tin: xoá bớt tin cũ nhất
+  fetch(chatUrl('?shallow=true'), { cache:'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).then(function(d){
+    var ks = d && typeof d === 'object' ? Object.keys(d).sort() : [];
+    if(ks.length <= CHAT_MAX) return;
+    var del = {}; ks.slice(0, ks.length - CHAT_MAX).forEach(function(k){ del[k] = null; });
+    fetch(chatUrl(), { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify(del) }).catch(noop);
+  }).catch(noop);
+}
+
 /* ======================= ỨNG DỤNG HỌP (tạo khi bấm nút) ======================= */
-function createApp(){
+function createApp(opts){
+  opts = opts || {};
   if(host.nextElementSibling) document.body.appendChild(host);   // nằm trên các widget khác (chưa có video nào phát)
   var ov = document.createElement('div'); ov.className = 'ov lobbyMode'; ov.innerHTML = HTML;
-  sroot.insertBefore(ov, toastEl);
+  sroot.insertBefore(ov, msgPop);      // popup tin nhắn + khung chat luôn nằm trên khung họp
   var R = {};
   [].forEach.call(ov.querySelectorAll('[data-r]'), function(e){ R[e.getAttribute('data-r')] = e; });
   var $ = function(k){ return R[k]; };
@@ -417,14 +1010,19 @@ function createApp(){
   var actx = null, zeroSink = null;
   var stage = $('stage'), srcVideo = $('srcVideo'), pttBtn = $('btnPTT');
   var localTile = null, localVideo = null, zTop = 10, ro = null;
+  var pipIn = null, pipOut = null, pipWin = null, pipGeo = null;   // khung video nổi: trong trang / cửa sổ nổi trên mọi cửa sổ
+  var CAN_POP = !IS_MOBILE && !!window.documentPictureInPicture && typeof window.documentPictureInPicture.requestWindow === 'function';
   var prefs = {
     cam: store('cam') || '', mic: store('mic') || '', spk: store('spk') || '',
-    bg: store('bg') || (IS_MOBILE ? 'none' : 'ideco'), bright: store('bright') !== '0', beep: store('beep') !== '0',
+    bg: store('bg') || (IS_MOBILE ? 'none' : 'ideco'), bright: store('bright') !== null ? store('bright') !== '0' : !IS_MOBILE, beep: store('beep') !== '0',
+    duck: store('duck') !== '0',
     micOnJoin: store('micOn') === '1'
   };
   $('inName').value = store('name') || '';
   $('chkMicOn').checked = prefs.micOnJoin;
   $('chkBeep').checked = prefs.beep;
+  $('chkDuck').checked = prefs.duck;
+  $('chkDuck').onchange = function(){ prefs.duck = this.checked; store('duck', prefs.duck ? '1' : '0'); };
 
   /* ---------- âm thanh: đo sóng, âm báo bộ đàm ---------- */
   function getActx(){
@@ -515,7 +1113,6 @@ function createApp(){
         if(dead){ if(s) s.getTracks().forEach(function(t){ t.stop(); }); return; }
         var v = s && s.getVideoTracks()[0], a = s && s.getAudioTracks()[0];
         rawCam = v || null; hasCam = !!v; camOn = hasCam;
-        if(v){ try{ v.contentHint = 'motion'; }catch(_){} }
         hasMic = !!a;
         micTrack = a || silentTrack();
         micTrack.enabled = false;
@@ -577,7 +1174,9 @@ function createApp(){
       lv = Math.sqrt(s / meterBuf.length);
     }
     level = level * 0.7 + lv * 0.3;
+    duckTick(level);
     pttBtn.style.setProperty('--lv', Math.min(1, level * 7).toFixed(3));
+    var pu = activePip(); if(pu) pu.mic.style.setProperty('--lv', Math.min(1, level * 7).toFixed(3));
     if(localTile) localTile.classList.toggle('speaking', micOn && level > 0.03);
     if(joined && hasMic && !micOn && level > 0.06){
       var now = Date.now();
@@ -587,6 +1186,18 @@ function createApp(){
     if(!minimized) for(var j = 0; j < waves.length; j++) if(waves[j].offsetParent) drawWave(waves[j], live);
   }
   requestAnimationFrame(waveLoop);
+
+  // Chống vọng tiếng (loa ngoài): khi mình đang nói, tạm giảm tiếng người khác để micro không thu lại
+  var duckUntil = 0, duckVol = 1;
+  function duckTick(lv){
+    if(IS_IOS || !joined) return;
+    var now = Date.now();
+    if(prefs.duck && micOn && lv > 0.04) duckUntil = now + 400;
+    var target = (prefs.duck && micOn && now < duckUntil) ? 0.3 : 1;
+    if(Math.abs(target - duckVol) < 0.02) return;
+    duckVol += (target - duckVol) * (target < duckVol ? 0.5 : 0.15);   // giảm nhanh, trả lại từ từ
+    Object.keys(peers).forEach(function(id){ var v = peers[id].video; if(v) try{ v.volume = clamp(duckVol, 0, 1); }catch(_){} });
+  }
 
   /* ---------- danh sách thiết bị ---------- */
   var camList = [];
@@ -647,7 +1258,6 @@ function createApp(){
       if(dead){ s.getTracks().forEach(function(t){ t.stop(); }); return; }
       var t = s.getVideoTracks()[0];
       if(!old) camOn = true;
-      try{ t.contentHint = 'motion'; }catch(_){}
       rawCam = t; hasCam = true; rawCam.enabled = camOn;
       prefs.cam = id; store('cam', id);
       updatePipeline();                      // tự gửi camera mới cho mọi người
@@ -723,12 +1333,12 @@ function createApp(){
     if(want){
       if(!pc2){ pc2 = document.createElement('canvas'); pctx = pc2.getContext('2d'); }
       var st = rawCam.getSettings ? rawCam.getSettings() : {}, vw = st.width || 1280, vh = st.height || 720;
-      var maxW = IS_MOBILE ? 640 : 960, W = Math.min(maxW, vw), H = Math.round(W * vh / vw);
+      var maxW = IS_MOBILE ? 640 : 960, W = Math.min(maxW, vw), H = Math.round(W * vh / vw);   // 540p: nét mà máy văn phòng vẫn chạy nhẹ
       if(vh > vw){ H = Math.min(maxW, vh); W = Math.round(H * vw / vh); }   // điện thoại cầm dọc
       if(pc2.width !== W || pc2.height !== H){ pc2.width = W; pc2.height = H; bgCache = null; pctx.fillStyle = '#eef1f6'; pctx.fillRect(0, 0, W, H); }
       var cur = srcVideo.srcObject && srcVideo.srcObject.getVideoTracks()[0];
       if(cur !== rawCam){ srcVideo.srcObject = new MediaStream([rawCam]); srcVideo.play().catch(noop); }
-      if(!procTrack || procTrack.readyState === 'ended'){ procTrack = pc2.captureStream(30).getVideoTracks()[0]; try{ procTrack.contentHint = 'motion'; }catch(_){} }
+      if(!procTrack || procTrack.readyState === 'ended'){ procTrack = pc2.captureStream(30).getVideoTracks()[0]; }
       oldProc = null; procOn = true; startTicker();
     }else{
       procOn = false; stopTicker(); srcVideo.srcObject = null; procTrack = null;
@@ -876,9 +1486,10 @@ function createApp(){
       $('pvMsg').classList.toggle('hidden', hasCam && camOn);
       return;
     }
-    setVid(localVideo, vt);
-    localTile.classList.toggle('mirror', mir);
+    setVid(localVideo, camTrack);          // khi chia sẻ: khung của mình KHÔNG hiện lại màn hình → không lặp hình vô tận
+    localTile.classList.toggle('mirror', !screenTrack && mir);
     renderTile(localTile, myState(), true);
+    localTile.classList.toggle('selfshare', !!screenTrack);
     var bc = $('btnCam');
     bc.className = 'ctl ' + (camOn ? 'on' : 'off');
     bc.lastElementChild.textContent = camOn ? 'Camera bật' : 'Camera tắt';
@@ -888,6 +1499,7 @@ function createApp(){
     pttBtn.classList.toggle('live', micOn);
     $('pttTxt').classList.toggle('live', micOn);
     $('pttTxt').textContent = micOn ? 'Đang mở mic' : 'Giữ để nói';
+    pipState();
   }
 
   /* ---------- popup: ai đang trong phòng, nhập tên, vào họp ---------- */
@@ -907,22 +1519,56 @@ function createApp(){
   var mediaReady = startMedia();
   loadPeerLib().catch(noop);   // tải sẵn thư viện kết nối trong lúc nhập tên → bấm Vào họp là vào liền
   $('inName').addEventListener('keydown', function(e){ if(e.key === 'Enter') join(); });
-  $('btnJoin').onclick = join;
+  $('btnJoin').onclick = function(){ join(false); };
+  $('btnJoinInvite').onclick = function(){ join(true); };   // mở họp + gửi lời mời cho mọi người trong 1 lần bấm
+  if(opts.auto && $('inName').value.trim()) setTimeout(function(){ if(!dead && !joined) join(false); }, 60);
+
+  // Chống vọng tiếng: không cho cùng 1 trình duyệt vào họp ở 2 tab (tab này phát tiếng, tab kia thu lại)
+  var chan = null, otherTab = '', takeover = false;
+  try{
+    chan = new BroadcastChannel('ideco-meet-' + ROOM);
+    chan.onmessage = function(ev){
+      var d = ev.data || {};
+      if(d.t === 'who' && joined) chan.postMessage({ t:'here', name:myName });
+      else if(d.t === 'here') otherTab = d.name || 'bạn';
+      else if(d.t === 'takeover' && joined){ teardown(); toast('Cuộc họp đã chuyển sang tab khác của bạn.'); }
+    };
+  }catch(_){ chan = null; }
+  function checkOtherTab(){
+    return new Promise(function(res){
+      if(!chan) return res(false);
+      otherTab = ''; chan.postMessage({ t:'who' });
+      setTimeout(function(){ res(!!otherTab); }, 150);   // cùng trình duyệt trả lời gần như tức thì
+    });
+  }
   $('lobbyClose').onclick = function(){ teardown(); };
   setTimeout(function(){ if(!dead && !$('inName').value && !IS_MOBILE) $('inName').focus(); }, 50);
 
-  function join(){
+  var inviteOnJoin = false;
+  function join(withInvite){
+    if($('btnJoin').disabled) return;
     myName = $('inName').value.trim();
     if(!myName){ lobbyMsg('Hãy nhập tên của bạn.'); $('inName').focus(); return; }
     store('name', myName);
     prefs.micOnJoin = $('chkMicOn').checked; store('micOn', prefs.micOnJoin ? '1' : '0');
+    inviteOnJoin = withInvite === true;
     getActx();
-    $('btnJoin').disabled = true; lobbyMsg('Đang vào phòng…');
-    Promise.all([mediaReady, loadPeerLib()]).then(function(){ if(!dead) claimSlot(slotOrder(), 0); }, function(){
-      backToLobby('Không tải được thư viện kết nối. Kiểm tra internet rồi thử lại.');
+    $('btnJoin').disabled = true; $('btnJoinInvite').disabled = true; lobbyMsg('Đang vào phòng…');
+    checkOtherTab().then(function(busy){
+      if(dead) return;
+      if(busy && !takeover){
+        takeover = true;
+        $('btnJoin').textContent = 'Vào ở đây (tab kia sẽ rời họp)';
+        backToLobby('Bạn đang họp ở một tab khác của trình duyệt này. Họp 2 nơi cùng lúc sẽ bị vọng tiếng.');
+        return;
+      }
+      if(busy && chan) chan.postMessage({ t:'takeover' });
+      Promise.all([mediaReady, loadPeerLib()]).then(function(){ if(!dead) claimSlot(slotOrder(), 0); }, function(){
+        backToLobby('Không tải được thư viện kết nối. Kiểm tra internet rồi thử lại.');
+      });
     });
   }
-  function backToLobby(msg){ $('btnJoin').disabled = false; lobbyMsg(msg); }
+  function backToLobby(msg){ $('btnJoin').disabled = false; $('btnJoinInvite').disabled = false; lobbyMsg(msg); }
 
   /* ---------- vào phòng: nhận 1 trong các "ghế" ---------- */
   function presSlots(){ return pres.ok ? pres.list.map(function(p){ return +p.slot; }).filter(function(n){ return n >= 1 && n <= MAX; }) : []; }
@@ -1010,6 +1656,7 @@ function createApp(){
     ov.classList.remove('lobbyMode'); ov.classList.add('roomMode');
     if(!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia || IS_MOBILE) $('btnShare').classList.add('hidden');
     var t = makeTile('me'); localTile = t.tile; localVideo = t.video; localVideo.muted = true;
+    pipInit();
     if(prefs.micOnJoin && hasMic){ micOn = true; micTrack.enabled = true; }
     refreshLocal(); layout(); updateCount();
     if(window.ResizeObserver){ ro = new ResizeObserver(queueLayout); ro.observe(stage); }
@@ -1023,6 +1670,7 @@ function createApp(){
     on(document, 'visibilitychange', function(){ if(!document.hidden){ keepAwake(); rescan(false); } });
     on(window, 'online', function(){ toast('Đã có mạng lại – đang nối lại cuộc họp…'); rescan(true); });
     renderPresence();
+    if(inviteOnJoin){ setTimeout(invite, 600); return; }
     if(!hasCam && !hasMic) toast('Không mở được camera/micro – bạn đang ở chế độ chỉ xem và nghe.');
     else if(!hasCam) toast('Không có camera – bạn tham gia bằng giọng nói.');
     else toast(micOn ? 'Đã vào họp. Micro đang bật.' : (IS_MOBILE ? 'Đã vào họp. Giữ nút 🎤 để nói.' : 'Đã vào họp. Giữ nút 🎤 (hoặc phím Space) để nói.'));
@@ -1031,12 +1679,36 @@ function createApp(){
     try{ if(navigator.wakeLock && !wakeLock) navigator.wakeLock.request('screen').then(function(l){ wakeLock = l; l.addEventListener('release', function(){ wakeLock = null; }); }, noop); }catch(_){}
   }
   function invite(){
+    if(chat.on){                                   // soạn lời mời trong khung chat → mọi máy hiện popup nhấp nháy
+      chatCompose(chatInviteText());
+      toast('Sửa nội dung lời mời rồi bấm Gửi – ERP của mọi người sẽ hiện thông báo nhấp nháy.');
+      return;
+    }
     presWrite('_call', 'PUT', { name:myName, ts:{'.sv':'timestamp'} }).then(function(ok){
       toast(ok ? 'Đã gửi lời mời – ai đang mở ERP sẽ thấy thông báo và tiếng chuông.' : 'Chưa gửi được lời mời qua ERP – hãy nhắn Zalo cho mọi người.');
     });
   }
   $('btnInvite').onclick = invite;
   $('btnInvite2').onclick = invite;
+  $('btnChat').onclick = function(){ chatToggle(); };
+  if(!chat.on) $('btnChat').classList.add('hidden');
+  function chatBadgeRoom(){ var b = $('chatBadge'); b.textContent = chat.unread > 9 ? '9+' : chat.unread; b.classList.toggle('hidden', !chat.unread); $('btnChat').classList.toggle('typing', !!chat.typing); }
+  chat.listeners.push(chatBadgeRoom); chatBadgeRoom();
+  /* đổi mật khẩu vào ứng dụng (chỉ hiện ở trang website) */
+  bindEyes(ov);
+  $('pwSave').onclick = function(){
+    var a = $('pwAdmin').value, n = $('pwNew').value.trim(), msg = $('pwMsg'), b = this;
+    if(hashPw(a) !== PASS_ADMIN){ msg.textContent = 'Mật khẩu quản trị chưa đúng.'; $('pwAdmin').focus(); return; }
+    if(n.length < 6){ msg.textContent = 'Mật khẩu mới cần từ 6 ký tự.'; $('pwNew').focus(); return; }
+    if(!CHAT_DB){ msg.textContent = 'Chưa cấu hình Firebase (CHAT_DB) nên không lưu được.'; return; }
+    var h = hashPw(n); b.disabled = true; msg.textContent = 'Đang lưu lên Firebase…';
+    fetch(passUrl(), { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ hash:h, ts:{'.sv':'timestamp'} }) }).then(function(r){
+      if(!r.ok) throw new Error('http');
+      gate.cur = h; store('pwCur', h); store('pw', h);
+      $('pwAdmin').value = ''; $('pwNew').value = '';
+      msg.textContent = '✅ Đã lưu. Mật khẩu mới áp dụng cho mọi máy từ lần mở ứng dụng tiếp theo.';
+    }).catch(function(){ msg.textContent = 'Chưa lưu được – kiểm tra mạng hoặc quyền ghi nút "' + PASS_NODE + '" trên Firebase.'; }).then(function(){ b.disabled = false; });
+  };
 
   /* ---------- kết nối giữa các thành viên ---------- */
   // Chỉ tạo khung hình khi người đó THẬT SỰ có mặt (đã gửi tên hoặc đã có hình) → không có khung "ma"
@@ -1185,15 +1857,20 @@ function createApp(){
           return;
         }
         applyParams(s, function(p){
-          p.degradationPreference = screenTrack ? 'maintain-resolution' : 'maintain-framerate';
+          p.degradationPreference = screenTrack ? 'maintain-resolution' : 'balanced';   // camera: giữ cân bằng nét/mượt
           p.encodings.forEach(function(e){
             if(pr.viewW === 0){ e.active = false; return; }      // người xem đang thu nhỏ: tạm ngừng gửi hình cho họ
             e.active = true;
-            if(screenTrack){ e.maxBitrate = Math.max(vb, 1200000); e.scaleResolutionDownBy = 1; e.maxFramerate = 15; return; }
+            if(screenTrack){
+              var sb = n <= 2 ? 2500000 : n <= 4 ? 1800000 : 1200000;
+              e.maxBitrate = sb; e.maxFramerate = n >= 5 ? 10 : 15;
+              e.scaleResolutionDownBy = sw > 1920 ? Math.round(sw / 1920 * 100) / 100 : 1;   // giữ đủ độ nét để người xem phóng to
+              return;
+            }
             var sc = base;
             if(pr.viewW > 0 && sw > 0) sc = Math.max(sc, clamp(sw / pr.viewW, 1, 4));
             e.scaleResolutionDownBy = Math.round(sc * 100) / 100;
-            e.maxBitrate = Math.round(clamp(vb / (sc * sc) * 1.3, 150000, vb));
+            e.maxBitrate = Math.round(clamp(vb / (sc * sc) * 1.5, 250000, vb));
             e.maxFramerate = fps;
           });
         });
@@ -1206,9 +1883,10 @@ function createApp(){
   function reportViews(){
     if(!joined || dead) return;
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if(minimized) syncPip(true);   // đang thu nhỏ: mọi người gửi hình vừa đúng cỡ ô trong khung nổi
     Object.keys(peers).forEach(function(id){
       var pr = peers[id]; if(!pr.tile || !hasOpenConn(pr)) return;
-      var w = minimized ? 0 : Math.round((parseFloat(pr.tile.style.width) || pr.tile.offsetWidth) * dpr);
+      var w = Math.round((minimized ? pipViewW(id) : (parseFloat(pr.tile.style.width) || pr.tile.offsetWidth)) * dpr);
       var last = sentView[id];
       if(last === undefined || (w === 0) !== (last === 0) || Math.abs(w - last) / Math.max(last, 1) > 0.15){
         sentView[id] = w; sendTo(id, { t:'view', w:w });
@@ -1271,7 +1949,8 @@ function createApp(){
       if(first && Date.now() - joinedAt > 4000){ joinChime(); toast('👋 ' + pr.state.name + ' đã vào họp'); if(minimized) btn.classList.add('talk'); }
       if(!first && pr.state.mic && !was.mic) beep([740], 0.05);
       if(pr.state.share !== was.share){
-        if(pr.state.share) toast(pr.state.name + ' đang chia sẻ màn hình');
+        if(pr.state.share) toast(pr.state.name + ' đang chia sẻ màn hình' + (IS_MOBILE ? ' · chụm 2 ngón để phóng to, ⛶ để xem toàn màn hình' : ' · lăn chuột hoặc nhấp đúp để phóng to'));
+        else if(ov.classList.contains('imm')) toggleImmersive(false);
         layout(); tuneSenders();
       }
     }
@@ -1281,7 +1960,8 @@ function createApp(){
     Object.keys(peers).forEach(function(id){ sendTo(id, msg); });
   }
   every(function(){
-    var any = false;
+    var any = false, pu = activePip();
+    if(pu && pu.tiles.me) pu.tiles.me.el.classList.toggle('speaking', micOn && level > 0.03);
     Object.keys(peers).forEach(function(id){
       var pr = peers[id], talk; if(!pr.tile) return;
       if(pr.an){
@@ -1291,6 +1971,7 @@ function createApp(){
         talk = pr.state.mic && pr.lv > 0.02;
       }else talk = pr.state.mic;
       pr.tile.classList.toggle('speaking', talk);
+      if(pu && pu.tiles[id]) pu.tiles[id].el.classList.toggle('speaking', !!talk);
       if(talk) any = true;
     });
     if(minimized) btn.classList.toggle('talk', any);
@@ -1308,9 +1989,10 @@ function createApp(){
     var n = document.createElement('span'); n.className = 'n';
     lb.appendChild(m); lb.appendChild(n);
     var mx = document.createElement('button'); mx.className = 'tbtn'; mx.type = 'button'; mx.title = 'Phóng to / thu nhỏ'; mx.textContent = '⤢';
-    mx.onclick = function(e){ e.stopPropagation(); toggleMax(tile); };
+    mx.onclick = function(e){ e.stopPropagation(); if(zoomable(tile)) goFull(tile); else toggleMax(tile); };
+    var zh = document.createElement('div'); zh.className = 'zoomHint';
     var rs = document.createElement('div'); rs.className = 'rs'; rs.title = 'Kéo để đổi cỡ';
-    tile.appendChild(v); tile.appendChild(av); tile.appendChild(tag); tile.appendChild(wk); tile.appendChild(lb); tile.appendChild(mx); tile.appendChild(rs);
+    tile.appendChild(v); tile.appendChild(av); tile.appendChild(tag); tile.appendChild(wk); tile.appendChild(lb); tile.appendChild(zh); tile.appendChild(mx); tile.appendChild(rs);
     var W = stage.clientWidth || 640, H = stage.clientHeight || 400;
     setRect(tile, W / 2 - 120, H / 2 - 68, 240);
     stage.appendChild(tile);
@@ -1320,7 +2002,10 @@ function createApp(){
   function renderTile(tile, st, isMe){
     tile.querySelector('.n').textContent = st.name + (isMe ? ' (bạn)' : '');
     tile.querySelector('.m').textContent = st.mic ? '🎤' : '🔇';
-    tile.querySelector('.avatar span').textContent = (st.name.trim()[0] || '?').toUpperCase();
+    tile.querySelector('.avatar span').textContent = (isMe && st.share) ? '🖥️ Bạn đang chia sẻ màn hình' : (st.name.trim()[0] || '?').toUpperCase();
+    if(!st.share) resetZoom(tile);
+    var tb = tile.querySelector('.tbtn');
+    if(tb){ tb.textContent = (st.share && !isMe) ? '⛶' : '⤢'; tb.title = (st.share && !isMe) ? 'Xem toàn màn hình' : 'Phóng to / thu nhỏ'; }
     tile.classList.toggle('micon', !!st.mic);
     tile.classList.toggle('camoff', !st.cam && !st.share);
     tile.classList.toggle('sharing', !!st.share);
@@ -1328,6 +2013,10 @@ function createApp(){
   function setRect(t, x, y, w){
     t.style.left = Math.round(x) + 'px'; t.style.top = Math.round(y) + 'px';
     t.style.width = Math.round(w) + 'px'; t.style.height = Math.round(w * 9 / 16) + 'px';
+  }
+  function setBox(t, x, y, w, h){
+    t.style.left = Math.round(x) + 'px'; t.style.top = Math.round(y) + 'px';
+    t.style.width = Math.round(w) + 'px'; t.style.height = Math.round(h) + 'px';
   }
   function fitIn(t, X, Y, W, H){ var w = Math.max(80, Math.min(W, H * 16 / 9)); setRect(t, X + (W - w) / 2, Y + (H - w * 9 / 16) / 2, w); }
   function gridIn(list, X, Y, W, H, G){
@@ -1363,20 +2052,64 @@ function createApp(){
     });
     var auto = all.filter(function(t){ return t.dataset.manual !== '1'; });
     var focus = auto.filter(function(t){ return t.classList.contains('sharing') && t !== localTile; })[0];
-    if(focus && auto.length > 1){
-      var others = auto.filter(function(t){ return t !== focus; });
-      if(W >= H * 1.1){
-        var side = clamp(W * 0.22, 150, 300);
-        fitIn(focus, P, P, W - side - P * 2 - G, H - P * 2);
-        gridIn(others, W - P - side, P, side, H - P * 2, G);
+    all.forEach(function(t){ t.classList.toggle('focus', t === focus); });
+    if(focus){
+      // Màn hình chia sẻ chiếm trọn khoảng trống (không ép khung 16:9) → điện thoại xem to nhất có thể
+      var others = auto.filter(function(t){ return t !== focus; }), narrow = W < 760;
+      var P2 = narrow ? 4 : 10, G2 = narrow ? 6 : 10;
+      if(!others.length) setBox(focus, P2, P2, W - P2 * 2, H - P2 * 2);
+      else if(W >= H * 1.1){
+        var side = narrow ? clamp(W * 0.17, 90, 140) : clamp(W * 0.2, 150, 280);
+        setBox(focus, P2, P2, W - side - P2 * 2 - G2, H - P2 * 2);
+        gridIn(others, W - P2 - side, P2, side, H - P2 * 2, G2);
       }else{
-        var top = H * 0.62;
-        fitIn(focus, P, P, W - P * 2, top - P);
-        gridIn(others, P, top + G, W - P * 2, H - top - G - P, G);
+        var th = narrow ? clamp(H * 0.14, 56, 100) : clamp(H * 0.25, 90, 200);
+        setBox(focus, P2, P2, W - P2 * 2, H - th - G2 - P2 * 2);
+        gridIn(others, P2, H - P2 - th, W - P2 * 2, th, G2);
       }
+      clampZoom(focus); applyZoom(focus);
     }else gridIn(auto, P, P, W - P * 2, H - P * 2 - waitH, G);
     queueViews();
   }
+  function zst(t){ return t._z || (t._z = { s:1, x:0, y:0 }); }
+  // Vùng nội dung thật (bỏ phần viền đen khi hình được thu vừa khung)
+  function contentBox(t){
+    var v = t.querySelector('video'), w = t.clientWidth, h = t.clientHeight;
+    var vw = (v && v.videoWidth) || 16, vh = (v && v.videoHeight) || 9, r = Math.min(w / vw, h / vh);
+    var cw = vw * r, ch = vh * r;
+    return { w:w, h:h, cw:cw, ch:ch, cx:(w - cw) / 2, cy:(h - ch) / 2 };
+  }
+  function clampZoom(t){
+    var z = zst(t), b = contentBox(t);
+    z.s = clamp(z.s, 1, 5);
+    // nội dung lớn hơn khung: không cho kéo lộ viền; nhỏ hơn khung: giữ ở giữa
+    z.x = b.cw * z.s >= b.w ? clamp(z.x, b.w - (b.cx + b.cw) * z.s, -b.cx * z.s) : (b.w - b.cw * z.s) / 2 - b.cx * z.s;
+    z.y = b.ch * z.s >= b.h ? clamp(z.y, b.h - (b.cy + b.ch) * z.s, -b.cy * z.s) : (b.h - b.ch * z.s) / 2 - b.cy * z.s;
+  }
+  function applyZoom(t){
+    var z = zst(t), v = t.querySelector('video'); if(!v) return;
+    v.style.transform = z.s > 1.01 ? 'translate(' + Math.round(z.x) + 'px,' + Math.round(z.y) + 'px) scale(' + z.s.toFixed(3) + ')' : '';
+    t.classList.toggle('zoomed', z.s > 1.01);
+    var zh = t.querySelector('.zoomHint'); if(zh) zh.textContent = '🔍 ' + Math.round(z.s * 100) + '% · chạm 2 lần để trả lại';
+  }
+  function zoomAt(t, px, py, ns){
+    var z = zst(t), s0 = z.s; ns = clamp(ns, 1, 5);
+    z.x = px - (px - z.x) * (ns / s0); z.y = py - (py - z.y) * (ns / s0); z.s = ns;
+    clampZoom(t); applyZoom(t);
+  }
+  function resetZoom(t){ if(t._z){ t._z = { s:1, x:0, y:0 }; applyZoom(t); } }
+  function zoomable(t){ return t.classList.contains('sharing') && t !== localTile; }
+  function goFull(t){
+    var v = t.querySelector('video');
+    if(document.fullscreenElement){ try{ document.exitFullscreen(); }catch(_){} return; }
+    if(t.requestFullscreen){
+      t.requestFullscreen().then(function(){
+        try{ if(screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(noop); }catch(_){}   // điện thoại: tự xoay ngang
+        setTimeout(function(){ clampZoom(t); applyZoom(t); }, 300);
+      }, function(){ if(v && v.webkitEnterFullscreen) v.webkitEnterFullscreen(); });
+    }else if(v && v.webkitEnterFullscreen) v.webkitEnterFullscreen();   // iPhone: trình xem gốc, chụm 2 ngón để phóng to
+  }
+  on(document, 'fullscreenchange', function(){ if(!document.fullscreenElement){ try{ screen.orientation.unlock(); }catch(_){} } queueLayout(); });
   function toggleMax(t){
     if(t.dataset.max === '1'){
       var p = null; try{ p = JSON.parse(t.dataset.prev || 'null'); }catch(_){}
@@ -1391,8 +2124,34 @@ function createApp(){
     queueViews();
   }
   function bindDrag(t){
-    var mode = null, pid = null, sx = 0, sy = 0, ox = 0, oy = 0, ow = 0, moved = false, lastTap = 0;
+    var mode = null, pid = null, sx = 0, sy = 0, ox = 0, oy = 0, ow = 0, moved = false, lastTap = 0, tapTimer = null;
+    var pts = {}, pinch = null, pan = null;
+    var rel = function(e){ var r = t.getBoundingClientRect(); return { x:e.clientX - r.left - t.clientLeft, y:e.clientY - r.top - t.clientTop }; };
+    var twoPts = function(){ var k = Object.keys(pts); return k.length >= 2 ? [pts[k[0]], pts[k[1]]] : null; };
+    // lăn chuột trên màn hình chia sẻ = phóng to / thu nhỏ tại vị trí con trỏ
+    t.addEventListener('wheel', function(e){
+      if(!zoomable(t)) return;
+      e.preventDefault();
+      var q = rel(e); zoomAt(t, q.x, q.y, zst(t).s * (e.deltaY < 0 ? 1.15 : 1 / 1.15));
+    }, { passive:false });
     t.addEventListener('pointerdown', function(e){
+      if(zoomable(t) && !(e.target.closest && e.target.closest('.tbtn'))){
+        e.preventDefault();
+        try{ t.setPointerCapture(e.pointerId); }catch(_){}
+        pts[e.pointerId] = { x:e.clientX, y:e.clientY };
+        var two = twoPts();
+        if(two){
+          var a = two[0], b = two[1], r = t.getBoundingClientRect();
+          pinch = { d:Math.hypot(a.x - b.x, a.y - b.y) || 1, s:zst(t).s, mx:(a.x + b.x) / 2 - r.left, my:(a.y + b.y) / 2 - r.top };
+          pan = null; moved = true;
+        }else{
+          pan = { sx:e.clientX, sy:e.clientY, x:zst(t).x, y:zst(t).y }; moved = false;
+          // chưa phóng to + máy tính + không phải khung chính: vẫn cho kéo di chuyển khung như bình thường
+          if(zst(t).s <= 1.01 && !t.classList.contains('focus') && e.pointerType === 'mouse'){ pan = null; delete pts[e.pointerId]; }
+          else return;
+        }
+        if(pinch) return;
+      }
       if(e.button > 0 || (e.target.closest && e.target.closest('.tbtn'))) return;
       var rc = t.getBoundingClientRect(), zone = e.pointerType === 'touch' ? 44 : 32;
       mode = (e.clientX > rc.right - zone && e.clientY > rc.bottom - zone) ? 'size' : 'move';
@@ -1402,6 +2161,19 @@ function createApp(){
       e.preventDefault();
     });
     t.addEventListener('pointermove', function(e){
+      if(pts[e.pointerId]){
+        pts[e.pointerId] = { x:e.clientX, y:e.clientY };
+        var two = twoPts();
+        if(pinch && two){
+          var a = two[0], b = two[1], d = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+          zoomAt(t, pinch.mx, pinch.my, pinch.s * d / pinch.d);
+        }else if(pan){
+          var ddx = e.clientX - pan.sx, ddy = e.clientY - pan.sy;
+          if(Math.abs(ddx) + Math.abs(ddy) > 6) moved = true;
+          if(zst(t).s > 1.01){ var z = zst(t); z.x = pan.x + ddx; z.y = pan.y + ddy; clampZoom(t); applyZoom(t); }
+        }
+        return;
+      }
       if(!mode || e.pointerId !== pid) return;
       var dx = e.clientX - sx, dy = e.clientY - sy;
       if(!moved && Math.abs(dx) + Math.abs(dy) < 5) return;
@@ -1416,7 +2188,28 @@ function createApp(){
         setRect(t, ox, oy, nw);
       }
     });
+    var zend = function(e){
+      if(!pts[e.pointerId]) return false;
+      delete pts[e.pointerId];
+      if(pinch){ if(!twoPts()){ pinch = null; var k = Object.keys(pts)[0]; pan = k ? { sx:pts[k].x, sy:pts[k].y, x:zst(t).x, y:zst(t).y } : null; } return true; }
+      pan = null;
+      if(!moved){
+        var now = Date.now();
+        if(now - lastTap < 320){
+          clearTimeout(tapTimer); lastTap = 0;
+          var q = rel(e);
+          var cb = contentBox(t), target = cb.ch < cb.h * 0.8 ? Math.min(4, cb.h / cb.ch) : 2;   // điện thoại dọc: phóng vừa khít chiều cao
+          if(zst(t).s > 1.01) resetZoom(t); else zoomAt(t, q.x, q.y, Math.max(2, target));   // chạm 2 lần: phóng to tại chỗ chạm / trả lại
+        }else{
+          lastTap = now;
+          // chạm 1 lần trên điện thoại: ẩn/hiện thanh nút để xem màn hình chia sẻ rộng hơn
+          if(e.pointerType !== 'mouse' && t.classList.contains('focus')) tapTimer = setTimeout(function(){ toggleImmersive(); }, 330);
+        }
+      }
+      return true;
+    };
     var end = function(e){
+      if(e && zend(e)) return;
       if(!mode || (e && e.pointerId !== pid)) return;
       mode = null; t.classList.remove('dragging');
       if(!moved){
@@ -1427,6 +2220,13 @@ function createApp(){
     t.addEventListener('pointerup', end);
     t.addEventListener('pointercancel', end);
     t.addEventListener('pointerup', function(){ if(moved) queueViews(); });
+  }
+  var immHinted = false;
+  function toggleImmersive(force){
+    var on2 = force === undefined ? !ov.classList.contains('imm') : !!force;
+    ov.classList.toggle('imm', on2);
+    if(on2 && !immHinted){ immHinted = true; toast('Chạm 1 lần vào màn hình chia sẻ để hiện lại các nút.'); }
+    queueLayout();
   }
   $('btnLayout').onclick = function(){
     [].forEach.call(stage.querySelectorAll('.tile'), function(t){ delete t.dataset.manual; delete t.dataset.max; delete t.dataset.prev; });
@@ -1439,6 +2239,7 @@ function createApp(){
     var n = tileCount();
     $('count').textContent = n + 1;
     $('wait').classList.toggle('hidden', !joined || n > 0);
+    pipState();
   }
 
   /* ---------- bộ đàm: giữ để nói, chạm để mở/tắt ---------- */
@@ -1496,18 +2297,237 @@ function createApp(){
   }
   $('btnShare').onclick = function(){
     if(screenTrack){ stopShare(); return; }
-    navigator.mediaDevices.getDisplayMedia({ video:{ frameRate:{ideal:15, max:30} }, audio:false }).then(function(s){
+    navigator.mediaDevices.getDisplayMedia({
+      // tối đa Full HD, 15 khung/giây: chữ nét mà máy không bị nặng → hết giật
+      video:{ width:{max:1920}, height:{max:1080}, frameRate:{ideal:15, max:15} },
+      audio:false,
+      selfBrowserSurface:'exclude',    // không cho chọn chính tab đang họp (nguyên nhân lặp hình)
+      surfaceSwitching:'include', systemAudio:'exclude', monitorTypeSurfaces:'include'
+    }).then(function(s){
       if(dead){ s.getTracks().forEach(function(t){ t.stop(); }); return; }
       screenTrack = s.getVideoTracks()[0];
       try{ screenTrack.contentHint = 'detail'; }catch(_){}
       screenTrack.onended = stopShare;
       pushVideo(); refreshLocal(); broadcast(); tuneSenders();
+      // Đang chia sẻ: thu gọn cuộc họp thành khung video nổi → mọi người không thấy cuộc họp lồng trong màn hình,
+      // còn bạn vẫn thấy mọi người và có sẵn nút micro / Dừng chia sẻ / Mở lại cuộc họp.
+      minimizeMeet();
+      toast(CAN_POP ? 'Đang chia sẻ màn hình. Bấm 🗗 trên khung nổi để khung luôn nằm trên mọi cửa sổ (Excel, ứng dụng khác…).'
+                    : 'Đang chia sẻ màn hình. Khung video nổi có nút "Dừng chia sẻ" và "Mở lại cuộc họp".');
     }).catch(noop);
   };
+  function minimizeMeet(){
+    if(document.fullscreenElement){ try{ document.exitFullscreen(); }catch(_){} }
+    minimized = true; ov.style.display = 'none'; setBtn('mini');
+    syncPip(true); reportViews();   // khung video nổi tự hiện; mọi người gửi hình cỡ nhỏ vừa khung
+  }
+  function restoreMeet(){
+    if(!minimized) return;
+    closePip();
+    minimized = false; ov.style.display = ''; setBtn('idle');
+    syncPip(true);
+    queueLayout();
+    Object.keys(peers).forEach(function(id){ var v = peers[id].video; if(v && v.paused) playV(v); });
+    reportViews();
+  }
   $('btnMin').onclick = function(){
-    minimized = true; ov.style.display = 'none'; setBtn('mini'); reportViews();   // đang thu nhỏ: báo mọi người tạm ngừng gửi hình
-    toast('Cuộc họp vẫn đang diễn ra – bấm nút đỏ "Đang họp" để quay lại.');
+    minimizeMeet();
+    toast('Cuộc họp vẫn đang diễn ra trong khung nổi – bấm "Mở lại cuộc họp" để quay lại.');
   };
+
+  /* ---------- khung video nổi: tự hiện khi chia sẻ màn hình hoặc thu nhỏ cuộc họp ---------- */
+  var PIP_MIN_W = IS_MOBILE ? 190 : 250, PIP_MIN_H = IS_MOBILE ? 170 : 200;
+  function activePip(){ return pipOut || (minimized && joined ? pipIn : null); }
+  function pipPlay(v){ var p = v.play(); if(p && p.catch) p.catch(noop); }
+  function buildPip(doc, inWin){
+    var el = doc.createElement('div');
+    el.className = 'pip' + (inWin ? ' win' : '');
+    el.innerHTML = PIP_HTML;
+    var q = function(k){ return el.querySelector('[data-p="' + k + '"]'); };
+    var ui = { el:el, doc:doc, inWin:inWin, tiles:{}, sig:'', head:q('head'), title:q('title'), pop:q('pop'), grid:q('grid'), mic:q('mic'), micTxt:q('micTxt'), stop:q('stop'), open:q('open'), rs:q('rs') };
+    // micro: giống nút bộ đàm trong phòng — giữ để nói, bấm nhanh để bật / tắt hẳn
+    ui.mic.addEventListener('pointerdown', function(e){ e.preventDefault(); try{ ui.mic.setPointerCapture(e.pointerId); }catch(_){} pressStart(); });
+    ui.mic.addEventListener('pointerup', pressEnd);
+    ui.mic.addEventListener('pointercancel', pressEnd);
+    ui.mic.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+    ui.mic.addEventListener('click', function(e){ if(e.detail === 0){ getActx(); setMic(!micOn, true); } });   // bấm bằng bàn phím
+    ui.stop.onclick = function(){ stopShare(); toast('Đã dừng chia sẻ màn hình.'); };
+    ui.open.onclick = function(){ try{ window.focus(); }catch(_){} restoreMeet(); };
+    ui.pop.classList.toggle('hidden', inWin || !CAN_POP);
+    if(!inWin){ ui.pop.onclick = popOut; bindPipDrag(ui); }
+    return ui;
+  }
+  function pipInit(){
+    if(pipIn) return;
+    pipIn = buildPip(document, false);
+    pipIn.el.classList.add('hidden');
+    sroot.insertBefore(pipIn.el, msgPop);
+    var w = IS_MOBILE ? 210 : 340, h = IS_MOBILE ? 200 : 290, g = null;
+    try{ g = JSON.parse(store('pip') || 'null'); }catch(_){ g = null; }
+    if(!g || !(g.w > 0) || !(g.h > 0) || typeof g.x !== 'number' || typeof g.y !== 'number')
+      g = { w:w, h:h, x:window.innerWidth - w - 12, y:window.innerHeight - h - (BTN_BOTTOM + 46) };
+    pipGeo = { x:g.x, y:g.y, w:g.w, h:g.h };
+    pipPlace(false);
+    on(window, 'resize', function(){ pipPlace(false); if(activePip() === pipIn) syncPip(); });
+    every(syncPip, 500);
+  }
+  function pipPlace(save){
+    if(!pipIn || !pipGeo) return;
+    var g = pipGeo, vw = window.innerWidth, vh = window.innerHeight;
+    g.w = clamp(g.w, PIP_MIN_W, Math.max(PIP_MIN_W, vw - 8)); g.h = clamp(g.h, PIP_MIN_H, Math.max(PIP_MIN_H, vh - 8));
+    g.x = clamp(g.x, 0, Math.max(0, vw - g.w)); g.y = clamp(g.y, 0, Math.max(0, vh - g.h));
+    var s = pipIn.el.style;
+    s.left = Math.round(g.x) + 'px'; s.top = Math.round(g.y) + 'px'; s.width = Math.round(g.w) + 'px'; s.height = Math.round(g.h) + 'px';
+    if(save) store('pip', JSON.stringify({ x:Math.round(g.x), y:Math.round(g.y), w:Math.round(g.w), h:Math.round(g.h) }));
+  }
+  // Kéo thanh tiêu đề để di chuyển, kéo góc dưới phải để phóng to / thu nhỏ
+  function bindPipDrag(ui){
+    var mode = null, pid = null, sx = 0, sy = 0, o = null;
+    var start = function(m){ return function(e){
+      if(e.button > 0 || (m === 'move' && e.target.closest && e.target.closest('button'))) return;
+      mode = m; pid = e.pointerId; sx = e.clientX; sy = e.clientY; o = { x:pipGeo.x, y:pipGeo.y, w:pipGeo.w, h:pipGeo.h };
+      try{ e.currentTarget.setPointerCapture(pid); }catch(_){}
+      ui.el.classList.add('moving'); e.preventDefault();
+    }; };
+    var move = function(e){
+      if(!mode || e.pointerId !== pid) return;
+      var dx = e.clientX - sx, dy = e.clientY - sy;
+      if(mode === 'move'){ pipGeo.x = o.x + dx; pipGeo.y = o.y + dy; }
+      else{
+        pipGeo.x = o.x; pipGeo.y = o.y;
+        pipGeo.w = Math.min(o.w + dx, window.innerWidth - o.x); pipGeo.h = Math.min(o.h + dy, window.innerHeight - o.y);
+      }
+      pipPlace(false);
+      if(mode === 'size') fitPip(ui);
+    };
+    var end = function(e){
+      if(!mode || (e && e.pointerId !== pid)) return;
+      var m = mode; mode = null; ui.el.classList.remove('moving');
+      pipPlace(true);
+      if(m === 'size') syncPip();
+    };
+    [[ui.head, 'move'], [ui.rs, 'size']].forEach(function(p){
+      p[0].addEventListener('pointerdown', start(p[1]));
+      p[0].addEventListener('pointermove', move);
+      p[0].addEventListener('pointerup', end);
+      p[0].addEventListener('pointercancel', end);
+    });
+  }
+  function pipTile(ui, id){
+    var d = ui.doc, t = d.createElement('div'); t.className = 'ptile';
+    var v = d.createElement('video'); v.muted = true; v.autoplay = true; v.playsInline = true; v.setAttribute('playsinline', '');   // luôn tắt tiếng: tiếng vẫn phát từ khung họp chính → không bị vọng
+    try{ v.disablePictureInPicture = true; }catch(_){}
+    var av = d.createElement('div'); av.className = 'pav'; var sp = d.createElement('span'); av.appendChild(sp);
+    var lb = d.createElement('div'); lb.className = 'plb';
+    t.appendChild(v); t.appendChild(av); t.appendChild(lb);
+    ui.grid.appendChild(t);
+    return (ui.tiles[id] = { el:t, v:v, av:sp, lb:lb, src:null });
+  }
+  function pipClear(ui){
+    Object.keys(ui.tiles).forEach(function(id){ var t = ui.tiles[id]; try{ t.v.srcObject = null; }catch(_){} t.el.remove(); });
+    ui.tiles = {}; ui.sig = '';
+  }
+  // Xếp các ô hình cho vừa khung: ai đang chia sẻ màn hình thì chiếm phần lớn, còn lại chia đều
+  function fitPip(ui){
+    var g = ui.grid, ids = Object.keys(ui.tiles), n = ids.length, W = g.clientWidth, H = g.clientHeight;
+    if(!n || !W || !H) return '';
+    var share = ids.filter(function(k){ return ui.tiles[k].el.classList.contains('sharing'); })[0], cols = 1, rows = '';
+    if(share){ if(n > 1){ cols = Math.min(n - 1, 4); rows = 'minmax(0,3fr)'; } }
+    else{
+      var best = Infinity;
+      for(var c = 1; c <= n; c++){
+        var r = Math.ceil(n / c), d = Math.abs(Math.log((W / c) / (H / r) / (16 / 9)));
+        if(d < best){ best = d; cols = c; }
+      }
+    }
+    g.style.gridTemplateColumns = 'repeat(' + cols + ',minmax(0,1fr))';
+    g.style.gridTemplateRows = rows;
+    ids.forEach(function(k){ ui.tiles[k].el.style.gridColumn = (k === share) ? '1 / -1' : ''; });
+    return n + ':' + cols + ':' + (share || '') + ':' + Math.round(W / 16) + ':' + Math.round(H / 16);
+  }
+  function pipViewW(id){
+    var ui = activePip(), t = ui && ui.tiles[id];
+    return t ? Math.max(1, t.el.offsetWidth, t.el.offsetHeight * 16 / 9) : 0;
+  }
+  function pipState(){
+    var n = tileCount() + 1;
+    [pipIn, pipOut].forEach(function(ui){
+      if(!ui) return;
+      ui.mic.classList.toggle('live', micOn);
+      ui.micTxt.textContent = micOn ? 'Đang mở mic' : 'Giữ để nói';
+      ui.stop.classList.toggle('hidden', !screenTrack);
+      ui.title.textContent = 'IDECO Meet · ' + n + ' người' + (screenTrack ? ' · 🖥️ đang chia sẻ' : '');
+    });
+  }
+  // Đồng bộ khung nổi với phòng họp (gọi lại bao nhiêu lần cũng được)
+  function syncPip(noQueue){
+    if(dead || !pipIn) return;
+    var ui = activePip();
+    pipIn.el.classList.toggle('hidden', ui !== pipIn);
+    if(ui !== pipIn) pipClear(pipIn);
+    if(!ui) return;
+    var seen = {};
+    var ids = Object.keys(peers).filter(function(id){ return peers[id].tile; }).sort(function(a, b){ return slotOf(a) - slotOf(b); });
+    ids.concat(['me']).forEach(function(id){
+      var me = id === 'me', pr = me ? null : peers[id], st = me ? myState() : pr.state;
+      var t = ui.tiles[id] || pipTile(ui, id);
+      seen[id] = 1;
+      var src = me ? camTrack : (pr.stream || null);
+      if(t.src !== src){
+        t.src = src;
+        try{ t.v.srcObject = !src ? null : (me ? new MediaStream([src]) : src); }catch(_){}
+        if(src) pipPlay(t.v);
+      }else if(src && t.v.paused) pipPlay(t.v);
+      var c = t.el.classList;
+      c.toggle('camoff', me ? !st.cam : (!st.cam && !st.share));
+      c.toggle('sharing', !me && !!st.share);
+      c.toggle('micon', !!st.mic);
+      c.toggle('mirror', me && !!localTile && localTile.classList.contains('mirror'));
+      var txt = (st.mic ? '🎤 ' : '🔇 ') + (me && st.share ? '🖥️ ' : '') + st.name + (me ? ' (bạn)' : '');
+      if(t.lb.textContent !== txt) t.lb.textContent = txt;
+      var ch = (st.name.trim()[0] || '?').toUpperCase();
+      if(t.av.textContent !== ch) t.av.textContent = ch;
+    });
+    Object.keys(ui.tiles).forEach(function(id){
+      if(seen[id]) return;
+      var t = ui.tiles[id]; try{ t.v.srcObject = null; }catch(_){}
+      t.el.remove(); delete ui.tiles[id];
+    });
+    var sig = fitPip(ui);
+    if(sig !== ui.sig){ ui.sig = sig; if(!noQueue) queueViews(); }
+  }
+  // 🗗 Chrome / Edge máy tính: đưa khung ra cửa sổ riêng luôn nổi trên mọi cửa sổ (Excel, ứng dụng khác…)
+  function popOut(){
+    if(!CAN_POP || pipOut || !pipIn || dead) return;
+    var r = pipIn.el.getBoundingClientRect(), p;
+    try{ p = window.documentPictureInPicture.requestWindow({ width:Math.round(clamp(r.width, 300, 960)), height:Math.round(clamp(r.height, 240, 720)) }); }
+    catch(e){ p = Promise.reject(e); }
+    p.then(function(w){
+      if(dead || !joined){ try{ w.close(); }catch(_){} return; }
+      var d = w.document;
+      try{ d.title = 'IDECO Meet'; d.documentElement.lang = 'vi'; }catch(_){}
+      var st = d.createElement('style');
+      st.textContent = '*{box-sizing:border-box}html,body{margin:0;height:100%;background:#1a2232;overflow:hidden}button{font:inherit;color:inherit}.hidden{display:none!important}\n' + PIP_CSS;
+      d.head.appendChild(st);
+      pipWin = w; pipOut = buildPip(d, true); d.body.appendChild(pipOut.el);
+      w.addEventListener('pagehide', function(){
+        if(pipWin !== w) return;                 // đóng cửa sổ nổi → khung quay về nằm trong trang
+        pipWin = null; pipOut = null;
+        if(!dead){ syncPip(true); reportViews(); }
+      });
+      w.addEventListener('resize', function(){ if(pipWin === w) syncPip(); });
+      if(!minimized) minimizeMeet();
+      pipState(); syncPip(true); reportViews();
+      toast('Khung họp đang nổi trên mọi cửa sổ – chuyển sang Excel hay ứng dụng khác vẫn thấy mọi người.');
+    }).catch(function(){
+      toast('Không mở được khung nổi trên mọi cửa sổ. Tính năng này cần Chrome hoặc Edge bản mới trên máy tính.');
+    });
+  }
+  function closePip(){
+    if(!pipWin) return;
+    var w = pipWin; pipWin = null; pipOut = null;
+    try{ w.close(); }catch(_){}
+  }
   $('btnLeave').onclick = function(){ teardown(); toast('Bạn đã rời cuộc họp.'); };
   on(window, 'pagehide', function(){ teardown(); });
 
@@ -1519,6 +2539,7 @@ function createApp(){
     if(wasJoined && mySlot) presWrite(String(mySlot), 'DELETE', undefined, true);
     presFast(false);
     pres.listeners = pres.listeners.filter(function(f){ return f !== lobbyPresence; });
+    chat.listeners = chat.listeners.filter(function(f){ return f !== chatBadgeRoom; });
     stopTicker();
     Object.keys(peers).forEach(function(id){
       var pr = peers[id];
@@ -1532,28 +2553,27 @@ function createApp(){
     var pp = peer;
     setTimeout(function(){ try{ if(pp) pp.destroy(); }catch(_){} }, 300);
     try{ if(claiming) claiming.destroy(); }catch(_){}
+    try{ if(chan) chan.close(); }catch(_){}
+    try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(_){}
     offs.forEach(function(f){ try{ f(); }catch(_){} });
     timers.forEach(clearInterval);
     if(ro) ro.disconnect();
     try{ if(wakeLock) wakeLock.release(); }catch(_){}
     try{ srcVideo.srcObject = null; }catch(_){}
     try{ if(actx) actx.close(); }catch(_){}
+    closePip();
+    if(pipIn){ pipClear(pipIn); pipIn.el.remove(); pipIn = null; }
     ov.remove();
     app = null; setBtn('idle');
     if(wasJoined){ pres.list = pres.list.filter(function(p){ return p.slot !== String(mySlot); }); pres.dismissed = true; renderPresence(); }
   }
 
   return {
-    restore: function(){
-      if(!minimized) return;
-      minimized = false; ov.style.display = ''; setBtn('idle');
-      queueLayout();
-      Object.keys(peers).forEach(function(id){ var v = peers[id].video; if(v && v.paused) playV(v); });
-      reportViews();
-    },
+    restore: restoreMeet,
     leave: teardown,
     isJoined: function(){ return joined; },
-    status: function(){ return { joined:joined, minimized:minimized, slot:mySlot, people:tileCount() + (joined ? 1 : 0), mic:micOn, cam:camOn, bg:bgMode, mobile:IS_MOBILE }; }
+    isOpen: function(){ return !minimized; },
+    status: function(){ return { joined:joined, minimized:minimized, float:pipOut ? 'window' : (minimized && joined ? 'page' : 'off'), slot:mySlot, people:tileCount() + (joined ? 1 : 0), mic:micOn, cam:camOn, bg:bgMode, mobile:IS_MOBILE }; }
   };
 }
 
@@ -1610,9 +2630,12 @@ function loadSegLib(){ return loadScript(SEG_BASE + 'selfie_segmentation.js', fu
 
 window.IDECO_MEET = {
   open: openMeet,
+  chat: function(text){ withGate(function(){ if(text) chatCompose(String(text)); else chatOpen(); }); },
   status: function(){
     var s = app ? app.status() : { joined:false, idle:true };
     s.presence = { ok:pres.ok, people:pres.list.map(function(p){ return p.name; }) };
+    s.pass = { required:REQUIRE_PASS, unlocked:unlocked() };
+    s.chat = { on:chat.on, mode:chat.mode, denied:chat.denied, messages:chat.keys.length, unread:chat.unread, open:chat.open };
     return s;
   }
 };
