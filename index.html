@@ -33,7 +33,7 @@
   window.IDECO_MEET_REQUIRE_PASS = true;
 </script>
 <!-- ============================================================================
- IDECO:BEGIN S049 | VIDEO CALL NỘI BỘ (IDECO Meet 1.9 · bản nhúng) — 12/11/2026
+ IDECO:BEGIN S049 | VIDEO CALL NỘI BỘ (IDECO Meet 2.0 · bản nhúng) — 13/11/2026
  VỊ TRÍ: CUỐI FILE, ngay trước </body> (sau SALES_AGENT_EMBED).
  - Nút nhỏ màu đỏ "Video call" ở góc phải, ngay TRÊN nút "Ứng dụng".
    Bấm → popup nhập tên → Vào họp. Camera/micro CHỈ mở khi nhân viên bấm nút.
@@ -65,6 +65,29 @@
    khi đang họp vẫn hiện đầy đủ, giữ đến khi đóng hoặc mở chat.
  - SỬA 1.9: mỗi tin nhắn mới từ máy/tab khác đều hiện lại popup nội dung,
    kể cả khi chat đang mở; tin của chính tab gửi không tự báo lại.
+ - MỚI 2.0 — NGƯỜI CHỦ TRÌ + MÃ MỜI (bật/tắt: INVITE_ONLY):
+   · Người chủ trì: ở màn hình vào họp chọn "⭐ Tôi là người chủ trì", nhập mật khẩu chủ trì
+     (mặc định = mật khẩu quản trị; đổi trong ⚙️ Cài đặt). Máy đã đăng nhập thì lần sau không hỏi lại.
+   · Trong phòng bấm "🔑 Mã mời" → mỗi lần bấm "Tạo mã" ra 1 mã 6 ký tự cho 1 người → Sao chép / Gửi qua Zalo.
+     Danh sách mã cho biết ai đã vào, có nút Thu hồi; người chủ trì mời ra được từng người và Kết thúc họp.
+   · Người được mời: chọn "🔑 Tôi có mã mời", nhập tên + mã → Vào họp. Bấm link trong lời mời thì mã tự điền.
+   · CHỐNG TRÙNG NGƯỜI: mỗi mã / mỗi máy chủ trì là 1 chỗ ngồi. Lỡ vào 2 lần (2 tab, 2 máy, tải lại trang)
+     thì phiên CŨ tự rời họp → không còn 2 khung cùng 1 người, không sai danh sách người họp.
+   · Firebase (CHAT_DB) cần cho phép đọc/ghi trong nút  ideco_meet_config  (đã dùng cho mật khẩu).
+ - MỚI 2.0 — CHỐNG HÚ MICRO / DỘI TIẾNG:
+   · Tự nhận biết 2 người NGỒI GẦN NHAU (micro máy này nghe trực tiếp giọng người kia trước khi tiếng qua mạng tới)
+     → tự tắt tiếng người đó trên máy này (vẫn nghe trực tiếp ngoài đời) → hết vòng hú. Khung người đó hiện "🏢 Ngồi gần".
+   · Tự phát hiện tiếng hú khi đang mở micro → tắt micro ngay + báo cho mọi người; máy ở gần bấm 1 nút là hết hú.
+   · Nút "🔊 Loa" trên thanh điều khiển và nút 🔊/🔇 trên từng khung: tắt loa máy này / tắt tiếng riêng 1 người.
+   · Bộ đệm tiếng 100 ms cho mạng 4G chập chờn → tiếng liền, không đứt đoạn; chống vọng giảm nhẹ, không giật.
+ - SỬA 2.0 — ĐIỆN THOẠI: camera xem trước hiện ngay sau khi nhập mật khẩu (tự phát lại hình khi trình duyệt
+   chặn tự phát; chạm 1 lần vào màn hình là hiện). Nút Camera trong phòng tự xin mở lại camera nếu lúc đầu chưa mở được.
+ - MỚI 2.0 — CHAT: mỗi tin có nút riêng: tin của mình "↩ Thu hồi", tin người khác "🗑 Xoá" (bấm 2 lần để chắc chắn);
+   tin biến mất trên mọi máy, popup của tin đó cũng tự tắt. Nút 🗑 trên đầu khung vẫn xoá hết như cũ.
+ - MỚI 2.0 — ĐÍNH KÈM FILE trong chat: nút 📎 (hoặc kéo-thả, hoặc Ctrl+V ảnh chụp màn hình) gửi ảnh, Excel, Word,
+   PDF, PowerPoint… tối đa FILE_MAX_MB (10 MB). Ảnh hiện ảnh nhỏ ngay trong chat, bấm để xem lớn / tải về;
+   file khác bấm để tải về. File lưu ở  ideco_meet_config/files_<ROOM>  và TỰ XOÁ sau FILE_DAYS (7) ngày
+   (máy nào đang mở ERP cũng tự dọn). Ảnh lớn được tự nén cho nhẹ.
  - Chỉnh nhanh: mục CẤU HÌNH ngay đầu script.
  - Tắt tạm: ENABLED = false.   GỠ BỎ: xóa nguyên khối từ BEGIN S049 đến END S049.
  - Kiểm tra: F12 → Console → IDECO_MEET.status()
@@ -95,13 +118,25 @@ var CHAT_KEEP     = 50;             // số tin gần nhất hiển thị trong 
 var CHAT_MAX      = 200;            // tự xoá tin cũ khi vượt quá số này
 var CHAT_POP_AGE  = 3 * 3600000;    // mở ERP sau: vẫn hiện popup cho tin chưa đọc trong 3 giờ gần nhất
 var CHAT_TYPING      = true;        // báo "đang nhập" nhấp nháy trên máy khác khi có người đang gõ
-var CHAT_TYPING_TEXT = true;        // true = hiện luôn nội dung đang gõ · false = chỉ hiện "đang nhập…"
+var CHAT_TYPING_TEXT = true;
+var FILE_MAX_MB   = 10;             // 2.0: đính kèm ảnh / Excel / Word / PDF trong chat — dung lượng tối đa mỗi file
+var FILE_DAYS     = 7;              // file tự xoá trên Firebase sau số ngày này        // true = hiện luôn nội dung đang gõ · false = chỉ hiện "đang nhập…"
 /* Mật khẩu vào ứng dụng — CHỈ dùng cho trang website (ideco-meet.html đặt window.IDECO_MEET_REQUIRE_PASS = true).
    Mật khẩu hiện hành lưu trên Firebase (dạng mã băm) tại PASS_NODE/pass; chưa có thì dùng mã băm mặc định bên dưới. */
 var REQUIRE_PASS  = window.IDECO_MEET_REQUIRE_PASS === true;
 var PASS_NODE     = 'ideco_meet_config';
 var PASS_DEFAULT  = '1939ebfec73b53bede8c81672a2a16dcf0f9b838977dd5ebd072c9cf6f9a87dc';   // mã băm của mật khẩu mặc định
 var PASS_ADMIN    = 'e52cbc685513fad1f6298738dfdaff1abc0bd7ec839129e25c03d6d8e65bb1a3';   // mã băm của mật khẩu quản trị (dùng khi đổi mật khẩu)
+/* Người chủ trì + mã mời (mới 2.0). Dữ liệu lưu trong PASS_NODE trên CHAT_DB: host (mật khẩu chủ trì, mã băm),
+   room_<ROOM> (cuộc họp đang mở, đã mã hoá), inv_<ROOM>/… (mã mời, chỉ lưu mã băm). */
+var INVITE_ONLY   = true;           // true = vào họp phải có mã mời do người chủ trì tạo · false = như bản cũ, ai cũng vào được
+var MEET_KEEP_MS  = 4 * 3600000;    // chủ trì vào lại trong 4 giờ → tiếp tục cuộc họp cũ (mã mời cũ vẫn dùng được)
+var MEET_URL      = '';             // link gửi kèm mã mời ('' = trang đang mở). Ví dụ: 'https://ten.github.io/ideco-meet/'
+var CODE_LEN      = 6;              // số ký tự mã mời
+/* Chống hú / dội tiếng (mới 2.0) */
+var NEAR_DETECT   = true;           // tự nhận biết người ngồi gần → tắt tiếng người đó trên máy này
+var HOWL_DETECT   = true;           // tự phát hiện tiếng hú khi đang mở micro → tắt micro + báo mọi người
+var AUDIO_BUFFER  = 100;            // ms bộ đệm tiếng (mạng 4G chập chờn vẫn nghe liền). 0 = để trình duyệt tự chỉnh
 /* Máy chủ trung gian giúp nối máy qua 4G / mạng công ty. Có TURN riêng thì thêm vào đây. */
 var ICE_SERVERS = [
   { urls:['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] },
@@ -143,6 +178,46 @@ function sha256(str){
 }
 function hashPw(s){ return sha256('ideco-meet|' + String(s)); }
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+/* ---------- chủ trì + mã mời (2.0) ---------- */
+var INVITE = INVITE_ONLY && !!CHAT_DB;
+var CODE_ABC = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';   // bỏ I, O, 0, 1 cho khỏi đọc nhầm
+function rnd(n, abc){
+  abc = abc || 'abcdefghijkmnpqrstuvwxyz23456789';
+  var a = new Uint32Array(n), s = '', i;
+  try{ crypto.getRandomValues(a); }catch(_){ for(i = 0; i < n; i++) a[i] = Math.floor(Math.random() * 4294967296); }
+  for(i = 0; i < n; i++) s += abc.charAt(a[i] % abc.length);
+  return s;
+}
+var DEV = store('dev'); if(!DEV || !/^[a-z0-9]{10}$/.test(DEV)){ DEV = rnd(10); store('dev', DEV); }   // mã riêng của trình duyệt này
+function normCode(s){ return String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }
+function fmtCode(c){ c = normCode(c); return c.length > 3 ? c.slice(0, 3) + ' ' + c.slice(3) : c; }
+function codeId(c){ return sha256('inv|' + ROOM + '|' + normCode(c)).slice(0, 24); }
+function meetHash(m){ return sha256('mh|' + m).slice(0, 16); }
+function xorHex(str, key){ var o = ''; for(var i = 0; i < str.length; i++) o += ('0' + ((str.charCodeAt(i) ^ parseInt(key.substr((i * 2) % 64, 2), 16)) & 255).toString(16)).slice(-2); return o; }
+function unxorHex(hex, key){ var s = ''; hex = String(hex || ''); for(var i = 0; i * 2 < hex.length; i++) s += String.fromCharCode(parseInt(hex.substr(i * 2, 2), 16) ^ parseInt(key.substr((i * 2) % 64, 2), 16)); return s; }
+function cfgUrl(sub){ return CHAT_DB.replace(/\/+$/, '') + '/' + PASS_NODE + '/' + sub + '.json'; }
+function fbGet(sub){ return fetch(cfgUrl(sub), { cache:'no-store' }).then(function(r){ if(!r.ok) throw new Error('http' + r.status); return r.json(); }); }
+function fbSend(sub, method, body, keepalive){
+  var o = { method:method, headers:{'Content-Type':'application/json'}, cache:'no-store' };
+  if(body !== undefined) o.body = JSON.stringify(body);
+  if(keepalive) o.keepalive = true;
+  return fetch(cfgUrl(sub), o).then(function(r){ if(!r.ok) throw new Error('http' + r.status); return r.json().catch(noop); });
+}
+function uiErr(m){ var e = new Error(m); e.ui = true; return e; }
+var hostHashP = null;
+function hostHash(force){                                     // mật khẩu chủ trì hiện hành (mã băm); chưa đặt thì = mật khẩu quản trị
+  if(hostHashP && !force) return hostHashP;
+  hostHashP = fbGet('host').then(function(d){ return (d && /^[0-9a-f]{64}$/.test(d.hash || '')) ? d.hash : PASS_ADMIN; }, function(){ hostHashP = null; throw uiErr('Chưa đọc được mật khẩu chủ trì (mất mạng?). Thử lại sau giây lát.'); });
+  return hostHashP;
+}
+var pendingCode = '';                                         // mở từ link mời: …#ma=ABC123
+(function(){
+  try{
+    var m = /(^|[#&?])ma=([A-Za-z0-9]{4,12})/.exec(location.hash || '');
+    if(m){ pendingCode = normCode(m[2]); history.replaceState(null, '', location.href.replace(/[#&]ma=[A-Za-z0-9]{4,12}/, '').replace(/#$/, '')); }
+  }catch(_){}
+})();
 
 /* Khung video nổi — dùng chung cho khung trong trang và cửa sổ nổi trên mọi cửa sổ (🗗) */
 var PIP_CSS = [
@@ -322,6 +397,47 @@ var CSS = [
 '.soundBar{position:absolute;left:50%;top:70px;transform:translateX(-50%);z-index:6}',
 '.soundBar button{background:var(--red);color:#fff;border:0;padding:12px 18px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(215,25,32,.35)}',
 '.srcVideo{position:fixed;left:0;top:0;width:2px;height:2px;opacity:0;pointer-events:none}',
+/* 2.0: chủ trì, mã mời, chống hú */
+'.roles{display:flex;gap:6px;margin-top:12px;background:var(--soft);padding:4px;border-radius:12px}',
+'.roles button{flex:1;border:0;background:transparent;padding:9px 6px;border-radius:9px;font-weight:700;font-size:13.5px;color:var(--muted);cursor:pointer}',
+'.roles button.on{background:#fff;color:var(--red);box-shadow:0 1px 4px rgba(26,34,50,.12)}',
+'input.codeIn{font-size:22px;font-weight:800;letter-spacing:4px;text-transform:uppercase;text-align:center;font-family:ui-monospace,Menlo,Consolas,monospace}',
+'input.codeIn::placeholder{font-size:15px;letter-spacing:1px;font-weight:600}',
+'.hostRem{margin-top:12px;background:#e8f6ee;color:#0f7a37;border-radius:10px;padding:9px 11px;font-size:13.5px;font-weight:600}',
+'.lnk{border:0;background:none;color:var(--red);font-weight:700;cursor:pointer;padding:0 4px;font-size:13px;text-decoration:underline}',
+'.pvTap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;background:var(--red);color:#fff;border:0;border-radius:12px;padding:12px 16px;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 8px 24px rgba(215,25,32,.35)}',
+'.btn.pri{background:var(--red);border-color:var(--red);color:#fff;font-weight:700}',
+'.btn.pri:hover{background:var(--red2)}',
+'.btn.danger{display:block;width:100%;margin-top:14px;color:var(--red2);border-color:#f5c2c4;background:#fdecec;font-weight:700}',
+'.irow{display:flex;gap:8px;align-items:stretch}',
+'.irow input{flex:1;min-width:0}',
+'.irow .btn{flex:none}',
+'.codeCard{margin-top:12px;border:2px dashed var(--red);border-radius:14px;padding:12px;text-align:center;background:#fff7f7}',
+'.codeCard .cc{font:800 34px/1.1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:6px;color:var(--red);margin:4px 0 10px;user-select:all;-webkit-user-select:all}',
+'.codeCard .ccTo{font-size:13px;color:var(--muted);font-weight:600}',
+'.codeCard .irow{justify-content:center;flex-wrap:wrap}',
+'.invList{display:flex;flex-direction:column;gap:6px;max-height:240px;overflow:auto}',
+'.inv{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:7px 9px;font-size:13px}',
+'.inv .ic{font:800 15px ui-monospace,Menlo,Consolas,monospace;letter-spacing:2px;color:#1a2232;flex:none}',
+'.inv .is{flex:1;min-width:0;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+'.inv .is b{color:#0f7a37}',
+'.inv.rv{opacity:.55}',
+'.inv button{flex:none;border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 8px;cursor:pointer;font-size:12px}',
+'.inv .empty{color:var(--muted)}',
+'.tile .sbtn,.tile .kbtn{position:absolute;top:8px;height:32px;min-width:32px;padding:0 6px;border-radius:9px;border:0;background:rgba(255,255,255,.92);cursor:pointer;font-size:15px;line-height:1;font-weight:700}',
+'.tile .sbtn{right:46px}',
+'.tile .kbtn{right:84px;color:var(--red2);font-size:12px}',
+'.tile .kbtn.arm{background:var(--red);color:#fff}',
+'.tile.me .sbtn,.tile.me .kbtn,.tile .kbtn.hidden{display:none}',
+'.tile.silenced .sbtn{background:var(--red);color:#fff}',
+'.tile .nearTag{position:absolute;left:8px;top:44px;background:rgba(26,34,50,.82);color:#fff;padding:2px 8px;border-radius:7px;font-size:11px;font-weight:700;display:none;pointer-events:none}',
+'.tile.near .nearTag{display:block}',
+'.tile .hostTag{display:none;margin-right:4px}',
+'.tile.host .hostTag{display:inline}',
+'.howlBar{position:absolute;left:50%;top:12px;transform:translateX(-50%);z-index:7;width:min(520px,calc(100% - 24px));background:#fff4d6;border:1px solid #f0c860;color:#5a4200;border-radius:14px;padding:10px 12px;font-size:13.5px;font-weight:600;box-shadow:0 10px 28px rgba(26,34,50,.18);text-align:center}',
+'.howlBar button{margin:8px 4px 0;border:0;border-radius:9px;padding:8px 12px;font-weight:700;cursor:pointer}',
+'.howlBar .hb1{background:var(--red);color:#fff}',
+'.howlBar .hb2{background:#fff;border:1px solid #e1c87a}',
 '.vcToast{position:fixed;left:50%;top:64px;transform:translateX(-50%);background:rgba(26,34,50,.92);color:#fff;padding:9px 16px;border-radius:10px;font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;opacity:0;transition:opacity .25s;pointer-events:none;z-index:' + Z + ';max-width:92vw;text-align:center}',
 '.vcToast.show{opacity:1}',
 /* chat nhóm + popup nhấp nháy */
@@ -355,10 +471,29 @@ var CSS = [
 '.cm .who{font-size:11px;font-weight:700;color:#667189}',
 '.cm.me .who{color:#b5121a}',
 '.cm .tx{font-size:14px;white-space:pre-wrap;word-break:break-word}',
+'.cm .cdel{border:0;background:transparent;color:#98a1b3;font-size:11px;font-weight:700;cursor:pointer;padding:0 0 0 8px;opacity:.75}',
+'.cm .cdel:hover{color:#b5121a;opacity:1}',
+'.cm .cdel.arm{color:#fff;background:#d71920;border-radius:6px;padding:1px 6px;margin-left:6px;opacity:1}',
 '.chatEmpty{margin:auto;text-align:center;color:#667189;font-size:13px;padding:10px}',
 '.chatErr{flex:none;background:#fff7ed;color:#9a3412;font-size:12px;padding:6px 12px;border-top:1px solid #fed7aa}',
 '.chatFt{flex:none;display:flex;flex-direction:column;gap:6px;padding:8px;border-top:1px solid #e1e6ee;background:#fff}',
 '.chatFt .row{display:flex;gap:6px}',
+'.chatFt .att{flex:none;width:40px;border:1px solid #e1e6ee;background:#fff;border-radius:10px;font-size:18px;cursor:pointer;padding:0}',
+'.chatFt .att:disabled{opacity:.5;cursor:wait}',
+'.cprog{font-size:12px;font-weight:700;color:#b5121a}',
+'.cm .cimg{display:block;max-width:100%;max-height:180px;border-radius:8px;margin-top:4px;cursor:zoom-in;background:#eef1f6}',
+'.cm .cfile{display:flex;align-items:center;gap:8px;width:100%;margin-top:4px;border:1px solid #e1e6ee;background:#f8fafc;border-radius:9px;padding:7px 9px;cursor:pointer;text-align:left;font-size:13px;color:#1a2232}',
+'.cm .cfile b{font-size:22px;line-height:1}',
+'.cm .cfile span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}',
+'.cm .cfile small{color:#667189;font-weight:500}',
+'.cm .cexp{margin-top:4px;font-size:12px;color:#98a1b3;font-style:italic}',
+'.lbox{pointer-events:auto;position:fixed;inset:0;z-index:' + Z + ';background:rgba(15,22,34,.88);display:flex;align-items:center;justify-content:center;padding:14px}',
+'.lbIn{display:flex;flex-direction:column;align-items:center;gap:10px;max-width:100%;max-height:100%}',
+'.lbIn img{max-width:94vw;max-height:calc(100dvh - 90px);object-fit:contain;border-radius:8px;background:#fff}',
+'.lbBar{display:flex;align-items:center;gap:10px;color:#fff;font:600 13px system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;flex-wrap:wrap;justify-content:center}',
+'.lbBar a,.lbBar button{border:0;border-radius:9px;padding:8px 14px;font-weight:700;cursor:pointer;text-decoration:none;font-size:13px}',
+'.lbDl{background:#d71920;color:#fff}',
+'.lbX{background:#fff;color:#1a2232}',
 '.chatFt input[type=text]{flex:1;min-width:0;width:auto;padding:9px 11px}',
 '.chatFt .send{flex:none;border:0;border-radius:10px;background:#d71920;color:#fff;font-weight:700;padding:0 14px;cursor:pointer}',
 '.chatFt .send:disabled{opacity:.55;cursor:wait}',
@@ -401,13 +536,24 @@ var HTML = '' +
  '<div class="pinfo hidden" data-r="pinfo"></div>' +
  '<div class="preview mirror" data-r="pvBox"><video data-r="pvVideo" muted playsinline autoplay></video>' +
   '<div class="pvMsg" data-r="pvMsg">Đang mở camera và micro…<br>Hãy bấm <b>&nbsp;Cho phép&nbsp;</b> khi trình duyệt hỏi.</div>' +
+  '<button class="pvTap hidden" data-r="pvTap" type="button">📷 Chạm để hiện camera</button>' +
   '<canvas class="wave"></canvas></div>' +
  '<div class="note">🎤 Nói thử: sóng âm đỏ nhảy theo giọng là micro đã hoạt động. 🎧 Đeo tai nghe để nghe rõ, không vọng tiếng.</div>' +
+ '<div class="roles' + (INVITE ? '' : ' hidden') + '" data-r="roles">' +
+  '<button type="button" data-role="guest">🔑 Tôi có mã mời</button><button type="button" data-role="host">⭐ Tôi là người chủ trì</button></div>' +
  '<label class="f">Tên của bạn</label>' +
  '<input data-r="inName" type="text" maxlength="30" placeholder="Ví dụ: Huyền – Kế toán" autocomplete="name">' +
+ '<div class="' + (INVITE ? '' : 'hidden') + '" data-r="guestBox"><label class="f">Mã mời <small>(người chủ trì gửi cho bạn)</small></label>' +
+  '<input class="codeIn" data-r="inCode" type="text" maxlength="9" placeholder="Ví dụ: K7P 3QX" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false"></div>' +
+ '<div class="hidden" data-r="hostBox">' +
+  '<div class="hostRem hidden" data-r="hostRem">✅ Máy này đã đăng nhập người chủ trì <button class="lnk" data-r="hostOut" type="button">Đăng xuất</button></div>' +
+  '<div data-r="hostPwWrap"><label class="f">Mật khẩu chủ trì</label>' +
+   '<div class="pwRow"><input type="password" data-r="inHost" placeholder="Mật khẩu chủ trì" autocomplete="off"><button class="eye" type="button" aria-label="Hiện mật khẩu">👁</button></div></div>' +
+  '<div class="note">Người chủ trì mở cuộc họp, rồi bấm <b>🔑 Mã mời</b> để tạo mã riêng cho từng người.</div></div>' +
  '<label class="chk"><input type="checkbox" data-r="chkMicOn"> Vào họp với micro bật sẵn <small>(mặc định: giữ nút để nói)</small></label>' +
+ '<label class="chk"><input type="checkbox" data-r="chkSpkOff"> 🔇 Vào họp với loa tắt <small>(nhiều máy cùng 1 phòng: chỉ cần 1 máy mở loa)</small></label>' +
  '<button class="btn primary" data-r="btnJoin" type="button">Vào họp</button>' +
- '<button class="btn" data-r="btnJoinInvite" type="button" style="display:block;width:100%;margin-top:8px;font-weight:700">📣 Mở cuộc họp & mời mọi người</button>' +
+ '<button class="btn hidden" data-r="btnJoinInvite" type="button" style="display:block;width:100%;margin-top:8px;font-weight:700">📣 Mở cuộc họp & mời mọi người</button>' +
  '<div class="lmsg" data-r="lobbyMsg"></div>' +
  '<details><summary>⚙️ Chọn camera, micro, loa và phông nền</summary><div data-r="setSlotLobby">' +
   '<div class="settings" data-r="settings">' +
@@ -433,6 +579,10 @@ var HTML = '' +
     '<div class="pwRow"><input type="password" data-r="pwAdmin" placeholder="Mật khẩu quản trị" autocomplete="off"><button class="eye" type="button" aria-label="Hiện mật khẩu">👁</button></div>' +
     '<div class="pwRow"><input type="password" data-r="pwNew" placeholder="Mật khẩu mới (từ 6 ký tự)" autocomplete="new-password"><button class="eye" type="button" aria-label="Hiện mật khẩu">👁</button></div>' +
     '<button class="btn sm" data-r="pwSave" type="button">💾 Lưu lên Firebase để áp dụng</button><div class="note" data-r="pwMsg"></div></div>' +
+   '<div class="pwBox' + (INVITE ? '' : ' hidden') + '"><label class="f">⭐ Đổi mật khẩu người chủ trì</label>' +
+    '<div class="pwRow"><input type="password" data-r="hpAdmin" placeholder="Mật khẩu quản trị" autocomplete="off"><button class="eye" type="button" aria-label="Hiện mật khẩu">👁</button></div>' +
+    '<div class="pwRow"><input type="password" data-r="hpNew" placeholder="Mật khẩu chủ trì mới (từ 6 ký tự)" autocomplete="new-password"><button class="eye" type="button" aria-label="Hiện mật khẩu">👁</button></div>' +
+    '<button class="btn sm" data-r="hpSave" type="button">💾 Lưu mật khẩu chủ trì</button><div class="note" data-r="hpMsg">Chưa đổi thì mật khẩu chủ trì = mật khẩu quản trị.</div></div>' +
   '</div>' +
  '</div></details>' +
 '</div></div>' +
@@ -442,24 +592,39 @@ var HTML = '' +
   '<span class="info"><span data-r="count">1</span> người</span><span class="sp"></span>' +
   '<button class="btn sm hidden" data-r="btnFlip" type="button" title="Đổi camera trước / sau">🔄 <span>Đổi cam</span></button>' +
   '<button class="btn sm" data-r="btnChat" type="button" title="Chat nhóm – nhắn tin cho mọi người đang mở ERP">💬 <span>Chat</span><b class="cbadge hidden" data-r="chatBadge"></b></button>' +
-  '<button class="btn sm" data-r="btnInvite" type="button" title="Viết lời mời họp – hiện popup nhấp nháy trên ERP của mọi người">📣 <span>Mời</span></button>' +
+  '<button class="btn sm' + (INVITE ? ' hidden' : '') + '" data-r="btnInvite" type="button" title="Viết lời mời họp – hiện popup nhấp nháy trên ERP của mọi người">📣 <span>Mời</span></button>' +
+  '<button class="btn sm pri hidden" data-r="btnCodes" type="button" title="Tạo mã mời cho từng người">🔑 <span>Mã mời</span></button>' +
   '<button class="btn sm" data-r="btnLayout" type="button" title="Xếp lại các khung video">⊞ <span>Xếp lại</span></button>' +
   '<button class="btn sm" data-r="btnMin" type="button" title="Thu nhỏ để làm việc, cuộc họp vẫn tiếp tục">▁ <span>Thu nhỏ</span></button>' +
  '</div>' +
  '<div class="stage" data-r="stage">' +
   '<div class="wait hidden" data-r="wait"><b class="dots">⏳ Đang chờ đồng nghiệp vào họp</b>' +
-   'Bấm để viết lời mời – ERP của mọi người sẽ hiện thông báo nhấp nháy.<br>' +
+   '<span data-r="waitTxt">Bấm để viết lời mời – ERP của mọi người sẽ hiện thông báo nhấp nháy.</span><br>' +
    '<button class="btn sm" data-r="btnInvite2" type="button">📣 Mời mọi người vào họp</button>' +
    '<small data-r="waitNote">Có người vào sẽ có tiếng báo và tên hiện lên màn hình.</small></div>' +
+  '<div class="howlBar hidden" data-r="howlBar"><span data-r="howlTxt"></span>' +
+   '<button class="hb1" data-r="howlMute" type="button">🔇 Tôi ngồi gần – tắt tiếng người đó</button><button class="hb2" data-r="howlX" type="button">Không phải tôi</button></div>' +
  '</div>' +
  '<div class="bar">' +
   '<button class="ctl on" data-r="btnCam" type="button"><i>📷</i><span>Camera</span></button>' +
+  '<button class="ctl on" data-r="btnSpk" type="button" title="Bật / tắt loa máy này"><i>🔊</i><span>Loa bật</span></button>' +
   '<button class="ctl" data-r="btnSet" type="button"><i>⚙️</i><span>Cài đặt</span></button>' +
   '<div class="ptt"><button class="pttBtn" data-r="btnPTT" type="button" aria-label="Giữ để nói">🎤</button><span class="pttTxt" data-r="pttTxt">Giữ để nói</span></div>' +
   '<button class="ctl" data-r="btnShare" type="button"><i>🖥️</i><span>Màn hình</span></button>' +
   '<button class="ctl leave" data-r="btnLeave" type="button"><i>📞</i><span>Rời họp</span></button>' +
  '</div>' +
  '<div class="setModal hidden" data-r="setModal"><div class="mcard"><div class="mhead">Cài đặt <button data-r="btnSetClose" type="button" aria-label="Đóng">✕</button></div><div data-r="setSlotRoom"></div></div></div>' +
+ '<div class="setModal hidden" data-r="invModal"><div class="mcard"><div class="mhead">🔑 Mời vào họp <button data-r="invClose" type="button" aria-label="Đóng">✕</button></div>' +
+  '<div class="note">Mỗi lần bấm <b>Tạo mã</b> ra 1 mã cho <b>1 người</b>. Gửi lời mời qua Zalo; người đó nhập tên + mã để vào. ' +
+   'Cùng 1 mã vào ở máy khác thì máy cũ tự rời – không bị trùng người.</div>' +
+  '<label class="f">Mời ai? <small>(không bắt buộc)</small></label>' +
+  '<div class="irow"><input type="text" data-r="invTo" maxlength="30" placeholder="Ví dụ: Hương – Kho" autocomplete="off"><button class="btn pri" data-r="invNew" type="button">➕ Tạo mã</button></div>' +
+  '<div class="codeCard hidden" data-r="codeCard"><div class="ccTo" data-r="codeTo"></div><div class="cc" data-r="codeBig"></div>' +
+   '<div class="irow"><button class="btn sm" data-r="codeCopy" type="button">📋 Sao chép lời mời</button><button class="btn sm hidden" data-r="codeShare" type="button">📤 Gửi…</button></div></div>' +
+  '<div class="lmsg" data-r="invMsg"></div>' +
+  '<label class="f">Mã đã tạo trong cuộc họp này <button class="lnk" data-r="invReload" type="button">🔄 Tải lại</button></label><div class="invList" data-r="invList"></div>' +
+  '<button class="btn sm danger" data-r="btnEnd" type="button">⏹ Kết thúc cuộc họp cho mọi người</button>' +
+ '</div></div>' +
  '<div class="soundBar hidden" data-r="soundBar"><button data-r="btnSound" type="button">🔊 Bấm để nghe tiếng</button></div>' +
 '</div>' +
 '<input type="file" data-r="bgFile" accept="image/*" class="hidden">' +
@@ -470,10 +635,10 @@ var host = null, sroot = null, btn = null, badge = null, bubble = null, toastEl 
 var chatBtn = null, chatBadgeEl = null, msgPop = null, chatEl = null, chatLs = null, chatIn = null, chatName = null, chatSendBtn = null, chatErr = null;
 var chatCf = null, chatTy = null, chatSt = null, typChip = null, lockEl = null, lockIn = null, lockGo = null, lockErr = null;
 
-function toast(msg){
+function toast(msg, ms){
   if(!toastEl) return;
   toastEl.textContent = msg; toastEl.classList.add('show');
-  clearTimeout(toastT); toastT = setTimeout(function(){ toastEl.classList.remove('show'); }, 3600);
+  clearTimeout(toastT); toastT = setTimeout(function(){ toastEl.classList.remove('show'); }, ms || 3600);
 }
 function setBtn(state){
   if(!btn) return;
@@ -516,7 +681,11 @@ function boot(){
      '<div class="chatTy hidden"></div>' +
      '<div class="chatFt"><button class="chip" type="button">📣 Soạn lời mời họp</button>' +
       '<input class="cn hidden" type="text" maxlength="30" placeholder="Tên của bạn (ví dụ: Huyền – Kế toán)" autocomplete="name">' +
-      '<div class="row"><input class="ci" type="text" maxlength="300" placeholder="Viết tin nhắn… ví dụ: Mời Hương họp online lúc 9h10" autocomplete="off"><button class="send" type="button">Gửi</button></div></div>' +
+      '<div class="cprog hidden"></div>' +
+      '<div class="row"><button class="att" type="button" title="Đính kèm ảnh, Excel, Word, PDF (tối đa ' + FILE_MAX_MB + ' MB, tự xoá sau ' + FILE_DAYS + ' ngày)" aria-label="Đính kèm file">📎</button>' +
+      '<input class="ci" type="text" maxlength="300" placeholder="Viết tin nhắn… ví dụ: Mời Hương họp online lúc 9h10" autocomplete="off"><button class="send" type="button">Gửi</button></div>' +
+      '<input class="cfIn hidden" type="file" accept="image/*,.pdf,.xls,.xlsx,.xlsm,.csv,.doc,.docx,.ppt,.pptx,.txt,.zip"></div>' +
+     '<div class="lbox hidden"><div class="lbIn"><img alt=""><div class="lbBar"><span class="lbName"></span><a class="lbDl" href="#" download>⬇ Tải về</a><button class="lbX" type="button">✕ Đóng</button></div></div></div>' +
     '</div>' +
     '<button class="typChip hidden" type="button" title="Mở khung chat"></button>' +
     '<div class="lock hidden" role="dialog" aria-label="Nhập mật khẩu"><div class="lockCard"><button class="lx" type="button" aria-label="Đóng">✕</button>' +
@@ -536,6 +705,7 @@ function boot(){
   chatBoot();
   watchAppsMenu(0);
   startPresencePoll();
+  if(pendingCode) setTimeout(function(){ openMeet(); }, 300);   // mở từ link mời → hiện ngay màn hình nhập tên + mã
 }
 
 /* ======================= TÍN HIỆU "ĐANG CÓ NGƯỜI HỌP" ======================= */
@@ -565,8 +735,17 @@ function pollPresence(){
       var v = d[k]; if(!v || typeof v !== 'object') return;
       var ts = +v.ts || 0, at = freshAt(k, ts, now);
       if(k === '_call'){ if(now - at < 180000) call = { name:String(v.name || 'Đồng nghiệp').slice(0, 30), key:String(ts) }; return; }
-      if(now - at < 75000) list.push({ slot:k, name:String(v.name || 'Đồng nghiệp').slice(0, 30) });
+      if(now - at < 75000) list.push({ slot:k, name:String(v.name || 'Đồng nghiệp').slice(0, 30), k:String(v.k || ''), ts:ts, h:!!v.h });
     });
+    // 2.0: cùng 1 người (cùng mã mời / cùng máy chủ trì) chỉ đếm 1 lần — giữ nhịp tim mới nhất
+    var byK = {}, out = [];
+    list.forEach(function(p){
+      if(!p.k){ out.push(p); return; }
+      var o = byK[p.k];
+      if(!o){ byK[p.k] = p; out.push(p); }
+      else if(p.ts > o.ts){ out[out.indexOf(o)] = p; byK[p.k] = p; }
+    });
+    list = out;
     pres.ok = true; pres.list = list; pres.call = call;
     renderPresence();
   }).catch(function(){ pres.ok = false; renderPresence(); });
@@ -658,6 +837,23 @@ function chatBoot(){
   chatBtn.onclick = function(){ withGate(chatToggle); };
   typChip.onclick = function(){ chatOpen(); };
   chatEl.querySelector('.rf').onclick = chatRefresh;
+  chatLs.addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('.cdel') : null; if(b){ chatDelOne(b); return; }
+    var f = e.target.closest ? e.target.closest('[data-f]') : null; if(f) fileOpen(f.getAttribute('data-f'), f);
+  });
+  var att = chatEl.querySelector('.att'), cfIn = chatEl.querySelector('.cfIn');
+  att.onclick = function(){ cfIn.value = ''; cfIn.click(); };
+  cfIn.onchange = function(){ var f = this.files && this.files[0]; if(f) fileSend(f); };
+  chatEl.addEventListener('dragover', function(e){ e.preventDefault(); });
+  chatEl.addEventListener('drop', function(e){ e.preventDefault(); var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if(f) fileSend(f); });
+  chatIn.addEventListener('paste', function(e){                // dán ảnh chụp màn hình (Ctrl+V) vào ô chat
+    var it = e.clipboardData && [].filter.call(e.clipboardData.items || [], function(x){ return x.kind === 'file'; })[0];
+    if(it){ var f = it.getAsFile(); if(f){ e.preventDefault(); fileSend(f); } }
+  });
+  var lb = sroot.querySelector('.lbox');
+  lb.querySelector('.lbX').onclick = function(){ lb.classList.add('hidden'); lb.querySelector('img').src = ''; };
+  lb.addEventListener('click', function(e){ if(e.target === lb) lb.querySelector('.lbX').click(); });
+  if(chat.on) setTimeout(fileCleanup, 8000 + Math.random() * 20000);   // tự dọn file quá hạn
   chatEl.querySelector('.cl').onclick = function(){ chatCf.classList.toggle('hidden'); };
   chatCf.querySelector('.n').onclick = function(){ chatCf.classList.add('hidden'); };
   chatCf.querySelector('.y').onclick = chatClear;
@@ -747,6 +943,7 @@ function chatChanged(){
   });
   typRender();
   chatShowErr();
+  if(chat.popKey && keys.indexOf(chat.popKey) < 0 && msgPop && !msgPop.classList.contains('hidden')) chatPopHide();   // tin vừa bị thu hồi → tắt popup trên mọi máy
   chatRender(fresh.length > 0);
   var last = null;
   for(var i = keys.length - 1; i >= 0; i--){ if(!chatSelf(keys[i])){ last = keys[i]; break; } }
@@ -795,7 +992,9 @@ function chatRender(stick){
   }
   chatLs.innerHTML = chat.keys.map(function(k){
     var m = chat.msgs[k], me = chatMine(k);
-    return '<div class="cm' + (me ? ' me' : '') + '"><div class="who">' + esc(me ? 'Bạn' : String(m.name || 'Đồng nghiệp').slice(0, 30)) + ' · ' + chatTime(m.ts) + '</div><div class="tx">' + esc(String(m.text).slice(0, 300)) + '</div></div>';
+    return '<div class="cm' + (me ? ' me' : '') + '"><div class="who">' + esc(me ? 'Bạn' : String(m.name || 'Đồng nghiệp').slice(0, 30)) + ' · ' + chatTime(m.ts) +
+      '<button class="cdel" type="button" data-k="' + esc(k) + '" title="' + (me ? 'Thu hồi tin này trên mọi máy' : 'Xoá riêng tin này trên mọi máy') + '">' + (me ? '↩ Thu hồi' : '🗑 Xoá') + '</button>' +
+      '</div>' + chatFileHtml(m) + (m.file && m.text === '📎 ' + m.file.n ? '' : '<div class="tx">' + esc(String(m.text).slice(0, 300)) + '</div>') + '</div>';
   }).join('');
   if(stick || near) chatLs.scrollTop = chatLs.scrollHeight;
 }
@@ -816,14 +1015,18 @@ function chatCompose(text){                                 // mở khung chat v
   chatIn.value = text || '';
   setTimeout(function(){ try{ chatIn.focus(); chatIn.setSelectionRange(chatIn.value.length, chatIn.value.length); }catch(_){} }, 40);
 }
-function chatSend(){
-  if(chat.sending || !chat.on) return;
+function chatWho(){
   var name = (store('name') || '').trim();
   if(!name){
     name = chatName.value.trim();
-    if(!name){ chatName.classList.remove('hidden'); chatName.focus(); toast('Hãy nhập tên của bạn trước khi gửi.'); return; }
+    if(!name){ chatName.classList.remove('hidden'); chatName.focus(); toast('Hãy nhập tên của bạn trước khi gửi.'); return ''; }
     name = name.slice(0, 30); store('name', name); chatName.classList.add('hidden');
   }
+  return name;
+}
+function chatSend(){
+  if(chat.sending || !chat.on) return;
+  var name = chatWho(); if(!name) return;
   var text = chatIn.value.replace(/\s+/g, ' ').trim().slice(0, 300);
   if(!text){ chatIn.focus(); return; }
   chat.sending = true; chatSendBtn.disabled = true;
@@ -855,12 +1058,129 @@ function chatRefresh(){
     chatShowErr(); toast(chat.denied ? 'Firebase chưa cho phép đọc tin nhắn – cần mở quyền trong Rules.' : 'Chưa tải lại được – kiểm tra mạng rồi thử lại.');
   }).then(function(){ chatConnect(); });
 }
+/* ---- 2.0: ĐÍNH KÈM FILE (ảnh, Excel, Word, PDF…) ----
+   File lưu ở  PASS_NODE/files_<ROOM>/<mã>  (chia khúc 900 KB), tin nhắn chỉ giữ tên + ảnh nhỏ xem trước.
+   Mỗi máy mở ERP thỉnh thoảng tự dọn file quá FILE_DAYS ngày (mã file chứa thời điểm gửi). */
+var FILE_CHUNK = 900000;
+function fileSize(n){ n = +n || 0; return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB'; }
+function fileIcon(name, type){
+  var e = String(name || '').toLowerCase().split('.').pop();
+  if(/^image\//.test(type || '')) return '🖼️';
+  if(e === 'pdf') return '📕'; if(/^(xls|xlsx|xlsm|csv)$/.test(e)) return '📗'; if(/^(doc|docx)$/.test(e)) return '📘';
+  if(/^(ppt|pptx)$/.test(e)) return '📙'; if(e === 'zip') return '🗜️'; return '📄';
+}
+function fileExpired(f, ts){ var t = +(String(f.id || '').match(/^f(\d{12,14})_/) || [])[1] || +ts || 0; return t && Date.now() - t > FILE_DAYS * 86400000; }
+function chatFileHtml(m){
+  var f = m.file; if(!f || typeof f !== 'object' || !f.id) return '';
+  if(fileExpired(f, m.ts)) return '<div class="cexp">📎 ' + esc(f.n) + ' – file đã tự xoá sau ' + FILE_DAYS + ' ngày</div>';
+  if(f.th && /^data:image\//.test(f.th)) return '<img class="cimg" src="' + esc(f.th) + '" data-f="' + esc(f.id) + '" alt="' + esc(f.n) + '" title="Bấm để xem lớn / tải về">';
+  return '<button class="cfile" type="button" data-f="' + esc(f.id) + '" title="Bấm để tải về"><b>' + fileIcon(f.n, f.t) + '</b><span>' + esc(f.n) + '</span><small>' + fileSize(f.s) + ' ⬇</small></button>';
+}
+function readUrl(blob){ return new Promise(function(res, rej){ var r = new FileReader(); r.onload = function(){ res(r.result); }; r.onerror = rej; r.readAsDataURL(blob); }); }
+function loadImg(url){ return new Promise(function(res, rej){ var i = new Image(); i.onload = function(){ res(i); }; i.onerror = rej; i.src = url; }); }
+function scaleImg(img, max, q){
+  var w = img.naturalWidth, h = img.naturalHeight, k = Math.min(1, max / Math.max(w, h)), c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
+  var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', q);
+}
+var fileBusy = false;
+function fileProg(t){ var p = chatEl && chatEl.querySelector('.cprog'); if(!p) return; p.textContent = t || ''; p.classList.toggle('hidden', !t); }
+function fileSend(file){
+  if(!chat.on || fileBusy) return;
+  var name = chatWho(); if(!name) return;
+  var isImg = /^image\/(png|jpe?g|webp|gif|bmp)$/i.test(file.type || '');
+  var fname = String(file.name || (isImg ? 'anh-chup.png' : 'file')).slice(0, 120);
+  if(file.size > FILE_MAX_MB * 1048576 && !isImg){ toast('File lớn quá (' + fileSize(file.size) + '). Tối đa ' + FILE_MAX_MB + ' MB.'); return; }
+  fileBusy = true; chatEl.querySelector('.att').disabled = true; fileProg('⏳ Đang chuẩn bị ' + fname + '…');
+  var fid = 'f' + Date.now() + '_' + rnd(6), meta = { id:fid, n:fname, s:file.size, t:file.type || '' };
+  readUrl(file).then(function(url){
+    if(!isImg) return url;
+    return loadImg(url).then(function(img){
+      meta.th = scaleImg(img, 320, 0.72);                                  // ảnh nhỏ hiện ngay trong khung chat
+      if(file.size > 1572864 && !/gif/i.test(file.type)){                   // ảnh lớn: nén lại cho nhẹ (vẫn rõ nét)
+        var u2 = scaleImg(img, 2400, 0.86); meta.t = 'image/jpeg'; meta.n = fname.replace(/\.[^.]+$/, '') + '.jpg';
+        meta.s = Math.round((u2.length - u2.indexOf(',') - 1) * 0.75); return u2;
+      }
+      return url;
+    }, function(){ return url; });
+  }).then(function(url){
+    if(meta.s > FILE_MAX_MB * 1048576) throw new Error('big');
+    var parts = {}; for(var i = 0, n = 0; i < url.length; i += FILE_CHUNK, n++) parts['p' + n] = url.slice(i, i + FILE_CHUNK);
+    fileProg('⏳ Đang gửi ' + meta.n + ' (' + fileSize(meta.s) + ')…');
+    return fbSend('files_' + ROOM + '/' + fid, 'PUT', { n:meta.n, t:meta.t, s:meta.s, c:Object.keys(parts).length, d:parts, by:name, at:{'.sv':'timestamp'} });
+  }).then(function(){
+    var text = '📎 ' + meta.n;
+    return fetch(chatUrl(), { method:'POST', headers:{'Content-Type':'application/json'}, cache:'no-store',
+      body:JSON.stringify({ name:name, text:text, file:meta, cid:chat.cid, tid:chat.tid, ts:{'.sv':'timestamp'} }) }).then(function(r){
+      if(!r.ok) throw new Error('http'); return r.json();
+    }).then(function(d){
+      if(d && d.name && !chat.msgs[d.name]){ chat.msgs[d.name] = { name:name, text:text, file:meta, cid:chat.cid, tid:chat.tid, ts:Date.now() }; chatChanged(); }
+      toast('Đã gửi file ' + meta.n + ' – tự xoá sau ' + FILE_DAYS + ' ngày.');
+    });
+  }).catch(function(e){
+    fbSend('files_' + ROOM + '/' + fid, 'DELETE').catch(noop);
+    toast(e && e.message === 'big' ? 'File lớn quá. Tối đa ' + FILE_MAX_MB + ' MB.' : 'Chưa gửi được file – kiểm tra mạng hoặc quyền ghi Firebase.');
+  }).then(function(){ fileBusy = false; chatEl.querySelector('.att').disabled = false; fileProg(''); });
+}
+function fileOpen(fid, el){
+  if(el.dataset.busy) return; el.dataset.busy = '1';
+  var old = el.tagName === 'BUTTON' ? el.querySelector('small').textContent : '';
+  if(old) el.querySelector('small').textContent = 'đang tải…';
+  fbGet('files_' + ROOM + '/' + fid).then(function(d){
+    if(!d || !d.d) throw new Error('gone');
+    var url = Object.keys(d.d).sort(function(a, b){ return +a.slice(1) - +b.slice(1); }).map(function(k){ return d.d[k]; }).join('');
+    var i = url.indexOf(','), bin = atob(url.slice(i + 1)), u8 = new Uint8Array(bin.length);
+    for(var j = 0; j < bin.length; j++) u8[j] = bin.charCodeAt(j);
+    var blob = new Blob([u8], { type:d.t || 'application/octet-stream' }), bu = URL.createObjectURL(blob);
+    setTimeout(function(){ URL.revokeObjectURL(bu); }, 300000);
+    var lb = sroot.querySelector('.lbox'), dl = lb.querySelector('.lbDl');
+    if(/^image\//.test(d.t || '')){
+      lb.querySelector('img').src = bu; lb.querySelector('.lbName').textContent = d.n || '';
+      dl.href = bu; dl.setAttribute('download', d.n || 'anh.jpg'); lb.classList.remove('hidden');
+    }else{
+      var a = document.createElement('a'); a.href = bu; a.download = d.n || 'file'; a.style.display = 'none';
+      sroot.appendChild(a); a.click(); a.remove();
+      toast('Đang tải về: ' + (d.n || 'file'));
+    }
+  }).catch(function(e){ toast(e && e.message === 'gone' ? 'File không còn (đã quá ' + FILE_DAYS + ' ngày hoặc đã bị xoá).' : 'Chưa tải được file – kiểm tra mạng.'); })
+    .then(function(){ delete el.dataset.busy; if(old) el.querySelector('small').textContent = old; });
+}
+function fileCleanup(){                                     // xoá file đã quá FILE_DAYS ngày
+  if(!CHAT_DB) return;
+  fetch(cfgUrl('files_' + ROOM) + '?shallow=true', { cache:'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).then(function(d){
+    if(!d || typeof d !== 'object') return;
+    var lim = Date.now() - FILE_DAYS * 86400000, del = {}, n = 0;
+    Object.keys(d).forEach(function(k){ var t = +(k.match(/^f(\d{12,14})_/) || [])[1]; if(!t || t < lim){ del[k] = null; n++; } });
+    if(n) fetch(cfgUrl('files_' + ROOM), { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify(del) }).catch(noop);
+  }).catch(noop);
+}
+/* 2.0: thu hồi / xoá RIÊNG 1 tin (bấm 2 lần để chắc chắn) — tin biến mất trên mọi máy */
+function chatDelOne(b){
+  var k = b.getAttribute('data-k'); if(!k || !chat.msgs[k]) return;
+  if(b.dataset.arm !== '1'){
+    var t0 = b.textContent; b.dataset.arm = '1'; b.classList.add('arm'); b.textContent = 'Chắc chắn?';
+    setTimeout(function(){ if(b.isConnected){ b.dataset.arm = ''; b.classList.remove('arm'); b.textContent = t0; } }, 3000);
+    return;
+  }
+  var mine = chatMine(k); b.disabled = true;
+  fetch(CHAT_DB.replace(/\/+$/, '') + '/' + CHAT_NODE + '/' + ROOM + '/' + encodeURIComponent(k) + '.json', { method:'DELETE' }).then(function(r){
+    if(!r.ok) throw new Error('http');
+    var fm = chat.msgs[k] && chat.msgs[k].file;
+    if(fm && fm.id) fbSend('files_' + ROOM + '/' + fm.id, 'DELETE').catch(noop);   // xoá luôn file đính kèm
+    delete chat.msgs[k]; delete chat.other[k];
+    if(chat.popKey === k) chatPopHide();
+    chatChanged(); chatRender();
+    toast(mine ? 'Đã thu hồi tin nhắn trên mọi máy.' : 'Đã xoá tin nhắn trên mọi máy.');
+  }).catch(function(){ b.disabled = false; toast('Chưa xoá được – kiểm tra mạng hoặc quyền ghi Firebase.'); });
+}
 function chatClear(){
   chatCf.classList.add('hidden');
   fetch(chatUrl(), { method:'DELETE' }).then(function(r){
     if(!r.ok) throw new Error('http');
     chat.msgs = {}; chatChanged(); chatRender(true);
-    toast('Đã xoá lịch sử chat trên mọi máy.');
+    fbSend('files_' + ROOM, 'DELETE').catch(noop);
+    toast('Đã xoá lịch sử chat (cả file đính kèm) trên mọi máy.');
   }).catch(function(){ toast('Chưa xoá được – kiểm tra mạng hoặc quyền ghi Firebase.'); });
 }
 /* ---- "đang nhập": máy đang gõ ghi nhịp vào Firebase, máy khác thấy dòng nhấp nháy ---- */
@@ -957,6 +1277,7 @@ function lockSubmit(){
   var h = hashPw(v);
   var ok = function(){
     store('pw', gate.cur);                                  // nhớ trên máy này: lần sau không hỏi lại
+    try{ lockIn.blur(); }catch(_){}                         // điện thoại: đóng bàn phím trước khi mở camera xem trước
     lockEl.classList.add('hidden'); lockIn.value = ''; lockErr.textContent = '';
     var f = gate.then; gate.then = null;
     if(chat.on) chatConnect();
@@ -1004,6 +1325,7 @@ function createApp(opts){
 
   /* ---------- trạng thái ---------- */
   var peer = null, claiming = null, mySlot = 0, myName = '', joined = false, joinedAt = 0, wakeLock = null;
+  var meetId = '', myKey = 'd:' + DEV, mySeq = Date.now(), isHost = false, roomKey = '', myCodeId = '';   // 2.0: cuộc họp, chỗ ngồi (chống trùng), vai trò
   var rawCam = null, procTrack = null, camTrack = null, micTrack = null, meterTrack = null, screenTrack = null, outStream = null, blackT = null;
   var hasCam = false, hasMic = false, micOn = false, camOn = false, camCount = 0;
   var peers = {}, pendingConn = {};
@@ -1016,10 +1338,12 @@ function createApp(opts){
     cam: store('cam') || '', mic: store('mic') || '', spk: store('spk') || '',
     bg: store('bg') || (IS_MOBILE ? 'none' : 'ideco'), bright: store('bright') !== null ? store('bright') !== '0' : !IS_MOBILE, beep: store('beep') !== '0',
     duck: store('duck') !== '0',
-    micOnJoin: store('micOn') === '1'
+    micOnJoin: store('micOn') === '1',
+    spkOff: store('spkOff') === '1'
   };
   $('inName').value = store('name') || '';
   $('chkMicOn').checked = prefs.micOnJoin;
+  $('chkSpkOff').checked = prefs.spkOff;
   $('chkBeep').checked = prefs.beep;
   $('chkDuck').checked = prefs.duck;
   $('chkDuck').onchange = function(){ prefs.duck = this.checked; store('duck', prefs.duck ? '1' : '0'); };
@@ -1103,6 +1427,8 @@ function createApp(opts){
 
   var mediaErr = '';
   function startMedia(){
+    [rawCam, micTrack, meterTrack].forEach(function(t){ try{ if(t) t.stop(); }catch(_){} });   // mở lại (bấm "Bật camera & micro")
+    rawCam = null; micTrack = null; meterTrack = null; mediaErr = '';
     var V = cons(VBASE, prefs.cam), A = cons(ABASE, prefs.mic);
     if(!prefs.cam) V.facingMode = 'user';
     return gum({video:V, audio:A})
@@ -1124,6 +1450,7 @@ function createApp(opts){
           if(mediaErr === 'insecure') pm.innerHTML = 'Trang cần được mở bằng địa chỉ <b>https://</b> thì mới dùng được camera và micro.';
           else if(mediaErr === 'NotAllowedError') pm.innerHTML = 'Bạn đang chặn camera và micro.<br>Bấm biểu tượng 🔒 / ⓘ cạnh địa chỉ trang → <b>Cho phép</b>, rồi bấm lại nút Video call.';
           else pm.innerHTML = 'Không tìm thấy camera và micro.<br>Bạn vẫn vào họp được ở chế độ chỉ xem và nghe.';
+          if(mediaErr !== 'insecure'){ $('pvTap').textContent = '📷 Bật camera & micro'; $('pvTap').classList.remove('hidden'); pm.innerHTML += '<br><br><br>'; }
         }else if(!hasCam){
           pm.innerHTML = 'Không tìm thấy camera.<br>Bạn vẫn vào họp bằng giọng nói được.';
         }
@@ -1193,11 +1520,124 @@ function createApp(opts){
     if(IS_IOS || !joined) return;
     var now = Date.now();
     if(prefs.duck && micOn && lv > 0.04) duckUntil = now + 400;
-    var target = (prefs.duck && micOn && now < duckUntil) ? 0.3 : 1;
+    var target = (prefs.duck && micOn && now < duckUntil) ? 0.45 : 1;   // 2.0: giảm nhẹ hơn → tiếng người khác không bị "đứt"
     if(Math.abs(target - duckVol) < 0.02) return;
-    duckVol += (target - duckVol) * (target < duckVol ? 0.5 : 0.15);   // giảm nhanh, trả lại từ từ
+    duckVol += (target - duckVol) * (target < duckVol ? 0.35 : 0.08);  // giảm êm, trả lại từ từ
     Object.keys(peers).forEach(function(id){ var v = peers[id].video; if(v) try{ v.volume = clamp(duckVol, 0, 1); }catch(_){} });
   }
+
+  /* ---------- 2.0: CHỐNG HÚ MICRO khi nhiều người ngồi gần nhau ----------
+     Hú xảy ra khi giọng A phát ra loa máy B ở ngay cạnh → micro A thu lại → vòng lặp.
+     1) Loa: nút "🔊 Loa" (tắt loa máy này) + nút 🔊/🔇 trên từng khung (tắt tiếng riêng 1 người).
+     2) Nhận biết NGỒI GẦN: micro máy này nghe thấy giọng người kia TRƯỚC khi tiếng của họ qua mạng tới
+        (đường không khí nhanh hơn đường mạng) → tự tắt tiếng người đó trên máy này (vẫn nghe trực tiếp).
+     3) Phát hiện tiếng HÚ (âm đơn kéo dài, rất to) khi đang mở micro → tắt micro ngay + báo mọi người. */
+  function applyOut(pr){
+    if(!pr) return;
+    var m = prefs.spkOff || !!pr.mute || !!pr.near;
+    if(pr.video && pr.video.muted !== m) pr.video.muted = m;
+    if(pr.tile){
+      pr.tile.classList.toggle('near', !!pr.near);
+      pr.tile.classList.toggle('silenced', !!(pr.mute || pr.near));
+      var sb = pr.tile.querySelector('.sbtn'); if(sb) sb.textContent = (pr.mute || pr.near) ? '🔇' : '🔊';
+    }
+  }
+  function applySpk(){
+    Object.keys(peers).forEach(function(id){ applyOut(peers[id]); });
+    var b = $('btnSpk');
+    b.className = 'ctl ' + (prefs.spkOff ? 'off' : 'on');
+    b.firstElementChild.textContent = prefs.spkOff ? '🔇' : '🔊';
+    b.lastElementChild.textContent = prefs.spkOff ? 'Loa tắt' : 'Loa bật';
+  }
+  $('btnSpk').onclick = function(){
+    prefs.spkOff = !prefs.spkOff; store('spkOff', prefs.spkOff ? '1' : '0'); $('chkSpkOff').checked = prefs.spkOff;
+    applySpk(); getActx();
+    if(!prefs.spkOff) Object.keys(peers).forEach(function(id){ playV(peers[id].video); });
+    toast(prefs.spkOff ? 'Đã tắt loa máy này – bạn không nghe tiếng từ máy này nữa (vẫn nói được).' : 'Đã bật loa.');
+  };
+
+  var nearHist = {}, nearMine = [], NEAR_N = 160, nearBufA = null, howlBuf = null, howl = { idx:-1, n:0, until:0 }, howlFrom = '';
+  function rmsOf(an, buf){ an.getByteTimeDomainData(buf); var s = 0; for(var i = 0; i < buf.length; i++){ var d = (buf[i] - 128) / 128; s += d * d; } return Math.sqrt(s / buf.length); }
+  function pushH(a, v){ a.push(v); if(a.length > NEAR_N) a.shift(); }
+  // tương quan: micro mình (a) đi TRƯỚC tiếng qua mạng (b) L nhịp
+  function corrLead(a, b, L){
+    var n = Math.min(a.length, b.length) - L; if(n < 40) return 0;
+    var oa = a.length - n - L, ob = b.length - n, ma = 0, mb = 0, i;
+    for(i = 0; i < n; i++){ ma += a[oa + i]; mb += b[ob + i]; } ma /= n; mb /= n;
+    var sab = 0, saa = 0, sbb = 0;
+    for(i = 0; i < n; i++){ var x = a[oa + i] - ma, y = b[ob + i] - mb; sab += x * y; saa += x * x; sbb += y * y; }
+    return (saa > 1e-9 && sbb > 1e-9) ? sab / Math.sqrt(saa * sbb) : 0;
+  }
+  function stdOf(a){ var m = 0, s = 0, i; for(i = 0; i < a.length; i++) m += a[i]; m /= (a.length || 1); for(i = 0; i < a.length; i++) s += (a[i] - m) * (a[i] - m); return Math.sqrt(s / (a.length || 1)); }
+  function nearSample(){                                // 30 ms/lần: đo mức tiếng micro mình + từng người
+    if(dead || !joined || !meterAn || !actx || actx.state !== 'running') return;
+    if(!nearBufA) nearBufA = new Uint8Array(meterAn.fftSize);
+    var mine = hasMic ? rmsOf(meterAn, nearBufA) : 0;
+    pushH(nearMine, mine);
+    Object.keys(peers).forEach(function(id){
+      var pr = peers[id], h = nearHist[id] || (nearHist[id] = []);
+      while(h.length < nearMine.length - 1) h.push(0);
+      pushH(h, pr.an ? rmsOf(pr.an, pr.buf) : 0);
+    });
+    if(HOWL_DETECT) howlCheck();
+  }
+  function nearEval(){                                  // 1 giây/lần: ai đang ngồi gần mình?
+    if(dead || !joined || !NEAR_DETECT || IS_IOS) return;
+    Object.keys(peers).forEach(function(id){
+      var pr = peers[id], r = nearHist[id]; if(!pr.an || !r || r.length < 100 || !pr.state.mic) return;
+      var rs = r.slice(-120), ms = nearMine.slice(-120);
+      if(stdOf(rs) < 0.006) return;                     // người đó đang im lặng
+      var lead = 0, echo = 0, L;
+      for(L = 2; L <= 20; L++) lead = Math.max(lead, corrLead(ms, rs, L));    // mic mình nghe trước 60–600 ms
+      for(L = 0; L <= 6; L++) echo = Math.max(echo, corrLead(rs, ms, L));     // tiếng vọng từ loa chính máy mình (đi sau)
+      pr.lead = lead; pr.leadAt = Date.now();
+      var micHears = stdOf(ms) > 0.004;
+      if(lead > 0.6 && lead > echo + 0.08 && micHears){ pr.nearHits = (pr.nearHits || 0) + 1; pr.farHits = 0; }
+      else{ pr.nearHits = Math.max(0, (pr.nearHits || 0) - 1); if(pr.near && lead < 0.25) pr.farHits = (pr.farHits || 0) + 1; }
+      if(!pr.near && !pr.nearOff && pr.nearHits >= 2){
+        pr.near = true; applyOut(pr);
+        toast('🏢 Bạn đang ngồi gần ' + pr.state.name + ' – đã tự tắt tiếng ' + pr.state.name + ' trên máy này để không hú (bạn vẫn nghe trực tiếp).', 7000);
+      }else if(pr.near && pr.farHits >= 8){
+        pr.near = false; pr.farHits = 0; applyOut(pr);
+        toast('Đã bật lại tiếng ' + pr.state.name + ' (không còn ngồi gần).');
+      }
+    });
+  }
+  function howlCheck(){
+    if(!micOn || !hasMic) { howl.n = 0; return; }
+    if(!howlBuf) howlBuf = new Float32Array(meterAn.frequencyBinCount);
+    meterAn.getFloatFrequencyData(howlBuf);
+    var hz = actx.sampleRate / meterAn.fftSize, lo = Math.max(2, Math.round(250 / hz)), hi = Math.min(howlBuf.length - 1, Math.round(5000 / hz));
+    var mx = -1e9, ix = -1, sum = 0, cnt = 0;
+    for(var i = lo; i <= hi; i++){ var v = howlBuf[i]; if(!isFinite(v)) continue; sum += v; cnt++; if(v > mx){ mx = v; ix = i; } }
+    var avg = cnt ? sum / cnt : -1e9;
+    if(mx > -38 && mx - avg > 32){                      // 1 âm đơn rất to nổi hẳn lên
+      if(Math.abs(ix - howl.idx) <= 1) howl.n++; else { howl.idx = ix; howl.n = 1; }
+    }else howl.n = 0;
+    if(howl.n >= 22 && Date.now() > howl.until){       // kéo dài ~0,7 giây → đang hú
+      howl.n = 0; howl.until = Date.now() + 8000;
+      setMic(false, false);
+      broadcast({ t:'howl', name:myName });
+      toast('⚠️ Phát hiện hú micro – đã tắt micro của bạn. Máy ngồi gần bạn nên tắt loa (nút 🔊) hoặc đeo tai nghe.', 7000);
+    }
+  }
+  function hideHowl(){ howlFrom = ''; $('howlBar').classList.add('hidden'); }
+  function onHowl(id, pr){
+    if(pr.near || pr.mute || prefs.spkOff) return;
+    if(!IS_IOS && pr.lead > 0.4 && Date.now() - (pr.leadAt || 0) < 10000){   // có dấu hiệu ngồi gần → tắt luôn
+      pr.near = true; applyOut(pr);
+      toast('🏢 ' + pr.state.name + ' bị hú vì ngồi gần bạn – đã tắt tiếng ' + pr.state.name + ' trên máy này.', 7000);
+      return;
+    }
+    howlFrom = id;
+    $('howlTxt').textContent = '⚠️ Đang hú micro ở chỗ ' + pr.state.name + '. Nếu bạn đang ngồi gần ' + pr.state.name + ':';
+    $('howlBar').classList.remove('hidden');
+    setTimeout(function(){ if(howlFrom === id) hideHowl(); }, 20000);
+  }
+  $('howlMute').onclick = function(){ var pr = peers[howlFrom]; if(pr){ pr.near = true; applyOut(pr); toast('Đã tắt tiếng ' + pr.state.name + ' trên máy này.'); } hideHowl(); };
+  $('howlX').onclick = hideHowl;
+  every(nearSample, 30);
+  every(nearEval, 1000);
 
   /* ---------- danh sách thiết bị ---------- */
   var camList = [];
@@ -1337,7 +1777,7 @@ function createApp(opts){
       if(vh > vw){ H = Math.min(maxW, vh); W = Math.round(H * vw / vh); }   // điện thoại cầm dọc
       if(pc2.width !== W || pc2.height !== H){ pc2.width = W; pc2.height = H; bgCache = null; pctx.fillStyle = '#eef1f6'; pctx.fillRect(0, 0, W, H); }
       var cur = srcVideo.srcObject && srcVideo.srcObject.getVideoTracks()[0];
-      if(cur !== rawCam){ srcVideo.srcObject = new MediaStream([rawCam]); srcVideo.play().catch(noop); }
+      if(cur !== rawCam){ srcVideo.srcObject = new MediaStream([rawCam]); playLocal(srcVideo); }
       if(!procTrack || procTrack.readyState === 'ended'){ procTrack = pc2.captureStream(30).getVideoTracks()[0]; }
       oldProc = null; procOn = true; startTicker();
     }else{
@@ -1473,9 +1913,43 @@ function createApp(opts){
   function setVid(v, track){
     if(!v || !track) return;
     var cur = v.srcObject && v.srcObject.getVideoTracks()[0];
-    if(cur !== track){ v.srcObject = new MediaStream([track]); var p = v.play(); if(p && p.catch) p.catch(noop); }
+    if(cur !== track){ v.srcObject = new MediaStream([track]); playLocal(v); }
+    else if(v.paused) playLocal(v);
   }
-  function myState(){ return { t:'state', name:myName, mic:micOn, cam:camOn, share:!!screenTrack }; }
+  /* Điện thoại (nhất là iPhone / app cài từ màn hình chính): trình duyệt có thể chặn tự phát hình camera xem trước
+     khi chưa chạm màn hình → tự thử lại, và chạm BẤT KỲ đâu (ô nhập tên…) là hình hiện ngay. */
+  var needTap = [];
+  function playLocal(v){
+    if(!v) return;
+    try{ v.muted = true; v.defaultMuted = true; v.playsInline = true; v.autoplay = true; v.setAttribute('playsinline', ''); v.setAttribute('webkit-playsinline', ''); }catch(_){}
+    if(!v.__kick){ v.__kick = true; v.addEventListener('loadedmetadata', function(){ if(v.paused && v.srcObject) tryPlay(v); }); }
+    tryPlay(v);
+    setTimeout(function(){ if(!dead && v.srcObject && v.paused) tryPlay(v, true); }, 1200);
+  }
+  function tryPlay(v, last){
+    var p; try{ p = v.play(); }catch(e){ p = null; }
+    if(p && p.catch) p.catch(function(e){
+      if(dead || !v.srcObject) return;
+      if(e && e.name === 'AbortError' && !last) return;          // đang đổi nguồn hình: lần thử sau sẽ phát
+      if(needTap.indexOf(v) < 0) needTap.push(v);
+      if(!joined && v === $('pvVideo')){ $('pvTap').textContent = '📷 Chạm để hiện camera'; $('pvTap').classList.remove('hidden'); }
+    });
+  }
+  function kickPlay(){
+    if(dead) return;
+    var l = needTap.splice(0);
+    [$('pvVideo'), localVideo, srcVideo].forEach(function(v){ if(v && v.srcObject && v.paused && l.indexOf(v) < 0) l.push(v); });
+    l.forEach(function(v){ tryPlay(v, true); });
+    $('pvTap').classList.add('hidden');
+  }
+  on(ov, 'pointerdown', kickPlay, true);
+  on(ov, 'touchend', kickPlay, true);
+  on(ov, 'keydown', kickPlay, true);
+  $('pvTap').onclick = function(){
+    if(!hasCam && !hasMic && !joined){ $('pvTap').classList.add('hidden'); $('pvMsg').innerHTML = 'Đang mở camera và micro…'; mediaReady = startMedia(); }
+    else kickPlay();
+  };
+  function myState(){ return { t:'state', name:myName, mic:micOn, cam:camOn, share:!!screenTrack, k:myKey, q:mySeq, h:isHost ? 1 : 0, id:peer ? peer.id : '' }; }
   function refreshLocal(){
     if(dead) return;
     var vt = screenTrack || camTrack;
@@ -1520,8 +1994,37 @@ function createApp(opts){
   loadPeerLib().catch(noop);   // tải sẵn thư viện kết nối trong lúc nhập tên → bấm Vào họp là vào liền
   $('inName').addEventListener('keydown', function(e){ if(e.key === 'Enter') join(); });
   $('btnJoin').onclick = function(){ join(false); };
-  $('btnJoinInvite').onclick = function(){ join(true); };   // mở họp + gửi lời mời cho mọi người trong 1 lần bấm
-  if(opts.auto && $('inName').value.trim()) setTimeout(function(){ if(!dead && !joined) join(false); }, 60);
+  $('btnJoinInvite').onclick = function(){ join(true); };   // (bản không dùng mã mời) mở họp + gửi lời mời cho mọi người
+  if(!INVITE) $('btnJoinInvite').classList.remove('hidden');
+
+  /* ---------- 2.0: chọn vai trò — có mã mời / người chủ trì ---------- */
+  var role = INVITE && store('role') === 'host' ? 'host' : 'guest';
+  if(pendingCode){ role = 'guest'; $('inCode').value = fmtCode(pendingCode); pendingCode = ''; }
+  else if(store('code')) $('inCode').value = fmtCode(store('code'));
+  function hostRemembered(){ return !!(store('hostH') && store('hostK')); }
+  function setRole(r){
+    role = r; if(INVITE) store('role', r);
+    [].forEach.call($('roles').querySelectorAll('button'), function(b){ b.classList.toggle('on', b.getAttribute('data-role') === r); });
+    $('guestBox').classList.toggle('hidden', !INVITE || r !== 'guest');
+    $('hostBox').classList.toggle('hidden', !INVITE || r !== 'host');
+    var rem = hostRemembered();
+    $('hostRem').classList.toggle('hidden', !rem);
+    $('hostPwWrap').classList.toggle('hidden', rem);
+    $('btnJoin').textContent = (INVITE && r === 'host') ? '⭐ Mở cuộc họp (chủ trì)' : 'Vào họp';
+    lobbyMsg('');
+  }
+  $('roles').addEventListener('click', function(e){ var b = e.target.closest ? e.target.closest('button') : null; if(b && !$('btnJoin').disabled) setRole(b.getAttribute('data-role')); });
+  $('hostOut').onclick = function(){ store('hostH', ''); store('hostK', ''); setRole('host'); try{ $('inHost').focus(); }catch(_){} };
+  $('inCode').addEventListener('input', function(){
+    var c = normCode(this.value).slice(0, CODE_LEN + 2), f = fmtCode(c);
+    if(this.value !== f){ this.value = f; try{ this.setSelectionRange(f.length, f.length); }catch(_){} }
+  });
+  $('inCode').addEventListener('keydown', function(e){ if(e.key === 'Enter') join(); });
+  $('inHost').addEventListener('keydown', function(e){ if(e.key === 'Enter') join(); });
+  $('chkSpkOff').onchange = function(){ prefs.spkOff = this.checked; store('spkOff', prefs.spkOff ? '1' : '0'); };
+  setRole(role);
+  var canAuto = !INVITE || (role === 'guest' ? normCode($('inCode').value).length === CODE_LEN : hostRemembered());
+  if(opts.auto && $('inName').value.trim() && canAuto) setTimeout(function(){ if(!dead && !joined) join(false); }, 60);
 
   // Chống vọng tiếng: không cho cùng 1 trình duyệt vào họp ở 2 tab (tab này phát tiếng, tab kia thu lại)
   var chan = null, otherTab = '', takeover = false;
@@ -1549,11 +2052,14 @@ function createApp(opts){
     if($('btnJoin').disabled) return;
     myName = $('inName').value.trim();
     if(!myName){ lobbyMsg('Hãy nhập tên của bạn.'); $('inName').focus(); return; }
+    var code = normCode($('inCode').value);
+    if(INVITE && role === 'guest' && code.length !== CODE_LEN){ lobbyMsg('Hãy nhập mã mời ' + CODE_LEN + ' ký tự do người chủ trì gửi.'); $('inCode').focus(); return; }
+    if(INVITE && role === 'host' && !hostRemembered() && !$('inHost').value){ lobbyMsg('Hãy nhập mật khẩu chủ trì.'); $('inHost').focus(); return; }
     store('name', myName);
     prefs.micOnJoin = $('chkMicOn').checked; store('micOn', prefs.micOnJoin ? '1' : '0');
     inviteOnJoin = withInvite === true;
     getActx();
-    $('btnJoin').disabled = true; $('btnJoinInvite').disabled = true; lobbyMsg('Đang vào phòng…');
+    $('btnJoin').disabled = true; $('btnJoinInvite').disabled = true; lobbyMsg(INVITE ? (role === 'host' ? 'Đang mở cuộc họp…' : 'Đang kiểm tra mã mời…') : 'Đang vào phòng…');
     checkOtherTab().then(function(busy){
       if(dead) return;
       if(busy && !takeover){
@@ -1563,12 +2069,76 @@ function createApp(opts){
         return;
       }
       if(busy && chan) chan.postMessage({ t:'takeover' });
-      Promise.all([mediaReady, loadPeerLib()]).then(function(){ if(!dead) claimSlot(slotOrder(), 0); }, function(){
-        backToLobby('Không tải được thư viện kết nối. Kiểm tra internet rồi thử lại.');
+      var seat = !INVITE ? Promise.resolve({ meet:'', key:'d:' + DEV, seq:Date.now(), host:false })
+               : role === 'host' ? hostSeat() : guestSeat(code);
+      seat.then(function(s){
+        if(dead) return;
+        meetId = s.meet; myKey = s.key; mySeq = s.seq; isHost = !!s.host; myCodeId = s.codeId || '';
+        lobbyMsg('Đang vào phòng…');
+        return Promise.all([mediaReady, loadPeerLib().catch(function(){ throw uiErr('Không tải được thư viện kết nối. Kiểm tra internet rồi thử lại.'); })]).then(function(){
+          if(!dead) claimSlot(slotOrder(), 0);
+        });
+      }).catch(function(e){
+        if(dead) return;
+        backToLobby((e && e.ui) ? e.message : 'Chưa kết nối được máy chủ. Kiểm tra internet rồi thử lại.');
       });
     });
   }
   function backToLobby(msg){ $('btnJoin').disabled = false; $('btnJoinInvite').disabled = false; lobbyMsg(msg); }
+
+  /* Người chủ trì: mở cuộc họp mới hoặc vào lại cuộc họp đang diễn ra (trong MEET_KEEP_MS) */
+  function hostSeat(){
+    var pw = $('inHost').value;
+    return hostHash(true).then(function(hh){
+      var key;
+      if(pw){
+        if(hashPw(pw) !== hh) throw uiErr('Mật khẩu chủ trì chưa đúng.');
+        key = sha256('room|' + ROOM + '|' + pw);
+        store('hostH', hh); store('hostK', key); $('inHost').value = '';
+      }else{
+        if(store('hostH') !== hh || !store('hostK')){ store('hostH', ''); store('hostK', ''); setRole('host'); throw uiErr('Mật khẩu chủ trì vừa được đổi – hãy nhập mật khẩu mới.'); }
+        key = store('hostK');
+      }
+      roomKey = key;
+      var rk = sha256('rk|' + key);
+      return fbGet('room_' + ROOM).catch(function(){ return null; }).then(function(rm){
+        var mid = '';
+        if(rm && rm.m && rm.mh){
+          var x = unxorHex(rm.m, rk);
+          var live = (Date.now() - (+rm.at || 0) < MEET_KEEP_MS) || (pres.ok && pres.list.length > 0);
+          if(/^[a-z0-9]{10}$/.test(x) && meetHash(x) === rm.mh && live) mid = x;
+        }
+        var fresh = !mid;
+        if(fresh) mid = rnd(10);
+        var put = fbSend('room_' + ROOM, 'PUT', { m:xorHex(mid, rk), mh:meetHash(mid), host:myName, at:{'.sv':'timestamp'}, v:2 });
+        if(fresh) put = put.then(function(){ return fbSend('inv_' + ROOM, 'DELETE').catch(noop); });   // cuộc họp mới: bỏ hết mã cũ
+        return put.then(function(){ return { meet:mid, key:'h:' + DEV, seq:Date.now(), host:true, fresh:fresh }; });
+      });
+    }).catch(function(e){
+      if(e && e.ui) throw e;
+      throw uiErr('Chưa ghi được lên Firebase để mở cuộc họp (kiểm tra mạng hoặc quyền ghi nút "' + PASS_NODE + '").');
+    });
+  }
+  /* Người được mời: kiểm tra mã → lấy cuộc họp → ghi "đã dùng" (số lần vào tăng dần: lần vào sau thắng lần trước) */
+  function guestSeat(code){
+    var id = codeId(code);
+    return Promise.all([fbGet('inv_' + ROOM + '/' + id), fbGet('room_' + ROOM)]).then(function(a){
+      var iv = a[0], rm = a[1];
+      if(!iv || !iv.m) throw uiErr('Mã mời "' + fmtCode(code) + '" không đúng hoặc đã hết hạn. Hãy hỏi lại người chủ trì.');
+      if(iv.rv) throw uiErr('Mã mời này đã bị người chủ trì thu hồi.');
+      var mid = unxorHex(iv.m, sha256('code|' + code));
+      if(!/^[a-z0-9]{10}$/.test(mid)) throw uiErr('Mã mời không đúng.');
+      if(!rm || rm.mh !== meetHash(mid)) throw uiErr('Cuộc họp của mã mời này đã kết thúc.');
+      var seq = ((iv.use && +iv.use.n) || 0) + 1;
+      return fbSend('inv_' + ROOM + '/' + id + '/use', 'PUT', { name:myName, dev:DEV, n:seq, at:{'.sv':'timestamp'} }).catch(noop).then(function(){
+        store('code', code);
+        return { meet:mid, key:'c:' + id, seq:seq, host:false, codeId:id };
+      });
+    }).catch(function(e){
+      if(e && e.ui) throw e;
+      throw uiErr('Chưa kiểm tra được mã mời (mất mạng?). Thử lại sau giây lát.');
+    });
+  }
 
   /* ---------- vào phòng: nhận 1 trong các "ghế" ---------- */
   function presSlots(){ return pres.ok ? pres.list.map(function(p){ return +p.slot; }).filter(function(n){ return n >= 1 && n <= MAX; }) : []; }
@@ -1624,7 +2194,7 @@ function createApp(opts){
       setupCall(call);
     });
   }
-  function slotId(s){ return PREFIX + ROOM + '-' + s; }
+  function slotId(s){ return PREFIX + ROOM + '-' + (meetId ? meetId + '-' : '') + s; }   // 2.0: mã cuộc họp bí mật nằm trong địa chỉ kết nối
   function hasOpenConn(pr){ return !!(pr && pr.conns.some(function(c){ return c.open; })); }
   // withCall = biết chắc ghế đó có người → gọi hình/tiếng NGAY cùng lúc nối dữ liệu (nhanh hơn 1 lượt bắt tay)
   function connectSlot(s, withCall){
@@ -1646,7 +2216,11 @@ function createApp(opts){
       for(var s = 1; s <= MAX; s++) connectSlot(s, busy.indexOf(s) >= 0);
     }else busy.forEach(function(s2){ connectSlot(s2, true); });
   }
-  function presBeat(){ if(joined && !dead) presWrite(String(mySlot), 'PUT', { name:myName, ts:{'.sv':'timestamp'}, mob:IS_MOBILE ? 1 : 0 }); }
+  function presBeat(){
+    if(!joined || dead) return;
+    presWrite(String(mySlot), 'PUT', { name:myName, ts:{'.sv':'timestamp'}, mob:IS_MOBILE ? 1 : 0, k:myKey.slice(0, 26), h:isHost ? 1 : 0, mh:meetId ? meetHash(meetId).slice(0, 8) : '' });
+    if(isHost && meetId) fbSend('room_' + ROOM + '/at', 'PUT', {'.sv':'timestamp'}).catch(noop);   // cuộc họp còn đang diễn ra
+  }
 
   function enterRoom(){
     joined = true; joinedAt = Date.now();
@@ -1656,6 +2230,14 @@ function createApp(opts){
     ov.classList.remove('lobbyMode'); ov.classList.add('roomMode');
     if(!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia || IS_MOBILE) $('btnShare').classList.add('hidden');
     var t = makeTile('me'); localTile = t.tile; localVideo = t.video; localVideo.muted = true;
+    localTile.classList.toggle('host', isHost);
+    if(INVITE){
+      $('btnCodes').classList.toggle('hidden', !isHost);
+      $('btnInvite2').classList.toggle('hidden', !isHost);
+      $('btnInvite2').textContent = '🔑 Tạo mã mời';
+      $('waitTxt').textContent = isHost ? 'Bấm 🔑 Tạo mã mời → gửi mã cho từng người qua Zalo (mỗi người 1 mã).'
+                                        : 'Người chủ trì và mọi người sẽ hiện ở đây khi vào họp.';
+    }
     pipInit();
     if(prefs.micOnJoin && hasMic){ micOn = true; micTrack.enabled = true; }
     refreshLocal(); layout(); updateCount();
@@ -1670,6 +2252,9 @@ function createApp(opts){
     on(document, 'visibilitychange', function(){ if(!document.hidden){ keepAwake(); rescan(false); } });
     on(window, 'online', function(){ toast('Đã có mạng lại – đang nối lại cuộc họp…'); rescan(true); });
     renderPresence();
+    applySpk();
+    if(isHost){ every(function(){ if(!$('invModal').classList.contains('hidden')) invLoad(); }, 5000); }
+    if(isHost && !(pres.ok && pres.list.some(function(p){ return p.k && p.k !== myKey.slice(0, 26); }))){ setTimeout(openCodes, 500); toast('Bạn là người chủ trì. Tạo mã mời để gửi cho từng người.'); return; }
     if(inviteOnJoin){ setTimeout(invite, 600); return; }
     if(!hasCam && !hasMic) toast('Không mở được camera/micro – bạn đang ở chế độ chỉ xem và nghe.');
     else if(!hasCam) toast('Không có camera – bạn tham gia bằng giọng nói.');
@@ -1689,7 +2274,120 @@ function createApp(opts){
     });
   }
   $('btnInvite').onclick = invite;
-  $('btnInvite2').onclick = invite;
+  $('btnInvite2').onclick = function(){ if(INVITE) openCodes(); else invite(); };
+  $('btnCodes').onclick = openCodes;
+
+  /* ---------- 2.0: bảng mã mời của người chủ trì ---------- */
+  var invData = {}, lastCode = null;
+  function inviteLink(code){ return (MEET_URL || location.href.split('#')[0]) + '#ma=' + code; }
+  function inviteText(code, to){
+    return 'Mời ' + (to || 'anh/chị') + ' vào họp video IDECO Meet' + (myName ? ' (chủ trì: ' + myName + ')' : '') + '.\n' +
+           '👉 Bấm link: ' + inviteLink(code) + '\n' +
+           '🔑 Mã mời: ' + fmtCode(code) + '\n' +
+           '(Nhập tên của bạn + mã mời rồi bấm Vào họp. Mã chỉ dùng cho 1 người.)';
+  }
+  function copyText(txt){
+    var done = function(){ toast('Đã sao chép lời mời – dán vào Zalo để gửi.'); };
+    var old = function(){
+      var ta = document.createElement('textarea'); ta.value = txt; ta.style.cssText = 'position:fixed;left:-9999px;top:0';
+      sroot.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); done(); }catch(_){ toast('Không sao chép tự động được – hãy chép mã bằng tay.'); }
+      ta.remove();
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, old); else old();
+  }
+  function openCodes(){
+    if(!isHost) return;
+    $('invModal').classList.remove('hidden');
+    $('invMsg').textContent = '';
+    invLoad();
+    if(!IS_MOBILE) setTimeout(function(){ try{ $('invTo').focus(); }catch(_){} }, 50);
+  }
+  $('invClose').onclick = function(){ $('invModal').classList.add('hidden'); };
+  $('invModal').addEventListener('click', function(e){ if(e.target === this) this.classList.add('hidden'); });
+  $('invReload').onclick = function(){ invLoad(); };
+  function invLoad(){
+    if(!isHost || dead) return;
+    fbGet('inv_' + ROOM).then(function(d){ if(dead) return; invData = (d && typeof d === 'object') ? d : {}; invRender(); }, function(){ $('invMsg').textContent = 'Chưa tải được danh sách mã (mất mạng?).'; });
+  }
+  function seatPeer(key){ var f = null; Object.keys(peers).forEach(function(id){ if(peers[id].key === key && peers[id].tile) f = peers[id]; }); return f; }
+  function invRender(){
+    var box = $('invList'), cc = sha256('cc|' + roomKey), mh = meetHash(meetId);
+    var ids = Object.keys(invData).filter(function(id){ var v = invData[id]; return v && v.c && (!v.mh || v.mh === mh); })
+                                 .sort(function(a, b){ return (+invData[b].at || 0) - (+invData[a].at || 0); });
+    box.innerHTML = '';
+    if(!ids.length){ box.innerHTML = '<div class="empty">Chưa có mã nào. Bấm ➕ Tạo mã.</div>'; return; }
+    ids.forEach(function(id){
+      var v = invData[id], code = unxorHex(v.c, cc);
+      if(!/^[A-Z0-9]+$/.test(code)) return;
+      var inRoom = seatPeer('c:' + id), st;
+      if(v.rv) st = 'Đã thu hồi';
+      else if(inRoom) st = '<b>🟢 Đang họp: ' + esc(inRoom.state.name) + '</b>';
+      else if(v.use) st = 'Đã dùng: ' + esc(v.use.name || '') + ' (đã rời)';
+      else st = 'Chưa dùng';
+      var row = document.createElement('div'); row.className = 'inv' + (v.rv ? ' rv' : '');
+      row.innerHTML = '<span class="ic">' + esc(fmtCode(code)) + '</span><span class="is">' + (v.to ? esc(v.to) + ' · ' : '') + st + '</span>';
+      if(!v.rv){
+        var cp = document.createElement('button'); cp.type = 'button'; cp.textContent = '📋'; cp.title = 'Sao chép lời mời';
+        cp.onclick = function(){ copyText(inviteText(code, v.to)); };
+        var rv = document.createElement('button'); rv.type = 'button'; rv.textContent = 'Thu hồi'; rv.title = 'Mã không dùng được nữa; người đang dùng mã sẽ phải rời họp';
+        rv.onclick = function(){
+          if(rv.dataset.arm !== '1'){ rv.dataset.arm = '1'; rv.textContent = 'Chắc chắn?'; setTimeout(function(){ rv.dataset.arm = ''; rv.textContent = 'Thu hồi'; }, 3000); return; }
+          revokeCode(id);
+        };
+        row.appendChild(cp); row.appendChild(rv);
+      }
+      box.appendChild(row);
+    });
+  }
+  function revokeCode(id){
+    fbSend('inv_' + ROOM + '/' + id + '/rv', 'PUT', true).then(function(){
+      if(invData[id]) invData[id].rv = true;
+      var p = seatPeer('c:' + id); if(p) kickPeer(p.id, true);
+      invRender(); toast('Đã thu hồi mã mời.');
+    }, function(){ toast('Chưa thu hồi được – kiểm tra mạng rồi thử lại.'); });
+  }
+  $('invNew').onclick = function(){
+    if(!isHost || !meetId) return;
+    var b = this, to = $('invTo').value.trim().slice(0, 30), code = rnd(CODE_LEN, CODE_ABC), id = codeId(code);
+    b.disabled = true; $('invMsg').textContent = 'Đang tạo mã…';
+    fbSend('inv_' + ROOM + '/' + id, 'PUT', { m:xorHex(meetId, sha256('code|' + code)), c:xorHex(code, sha256('cc|' + roomKey)), mh:meetHash(meetId), to:to, by:myName, at:{'.sv':'timestamp'} }).then(function(){
+      lastCode = { code:code, to:to };
+      $('codeBig').textContent = fmtCode(code);
+      $('codeTo').textContent = to ? 'Mã mời cho: ' + to : 'Mã mời mới (dùng cho 1 người)';
+      $('codeCard').classList.remove('hidden');
+      $('invMsg').textContent = ''; $('invTo').value = '';
+      invData[id] = { c:xorHex(code, sha256('cc|' + roomKey)), mh:meetHash(meetId), to:to, at:Date.now() }; invRender();
+    }, function(){ $('invMsg').textContent = 'Chưa tạo được mã (kiểm tra mạng hoặc quyền ghi Firebase).'; }).then(function(){ b.disabled = false; });
+  };
+  $('invTo').addEventListener('keydown', function(e){ if(e.key === 'Enter') $('invNew').click(); });
+  $('codeCopy').onclick = function(){ if(lastCode) copyText(inviteText(lastCode.code, lastCode.to)); };
+  if(navigator.share) $('codeShare').classList.remove('hidden');
+  $('codeShare').onclick = function(){ if(lastCode) navigator.share({ title:'Mời họp IDECO Meet', text:inviteText(lastCode.code, lastCode.to) }).catch(noop); };
+  $('btnEnd').onclick = function(){
+    var b = this;
+    if(b.dataset.arm !== '1'){ b.dataset.arm = '1'; b.textContent = '⚠️ Bấm lần nữa để KẾT THÚC cho mọi người'; setTimeout(function(){ b.dataset.arm = ''; b.textContent = '⏹ Kết thúc cuộc họp cho mọi người'; }, 4000); return; }
+    broadcast({ t:'end' });
+    fbSend('room_' + ROOM, 'DELETE', undefined, true).catch(noop);
+    fbSend('inv_' + ROOM, 'DELETE', undefined, true).catch(noop);
+    setTimeout(function(){ teardown(); toast('Đã kết thúc cuộc họp. Mọi mã mời của cuộc họp này hết hiệu lực.', 6000); }, 250);
+  };
+  /* mời 1 người ra khỏi phòng (chủ trì) */
+  function kickPeer(id, revoked){
+    var pr = peers[id]; if(!pr || !isHost) return;
+    sendTo(id, { t:'kick' });
+    broadcast({ t:'kicked', k:pr.key });
+    if(!revoked && pr.key && pr.key.indexOf('c:') === 0) fbSend('inv_' + ROOM + '/' + pr.key.slice(2) + '/rv', 'PUT', true).catch(noop);
+    var nm = pr.state.name;
+    setTimeout(function(){ removePeer(id, false, true); toast('Đã mời ' + nm + ' ra khỏi cuộc họp.'); }, 300);
+  }
+  /* bị buộc rời họp: vào lại ở máy/tab khác, bị mời ra, hoặc cuộc họp kết thúc */
+  function forcedOut(msg, clearCode){
+    if(dead) return;
+    if(clearCode) store('code', '');
+    teardown();
+    toast(msg, 8000);
+  }
   $('btnChat').onclick = function(){ chatToggle(); };
   if(!chat.on) $('btnChat').classList.add('hidden');
   function chatBadgeRoom(){ var b = $('chatBadge'); b.textContent = chat.unread > 9 ? '9+' : chat.unread; b.classList.toggle('hidden', !chat.unread); $('btnChat').classList.toggle('typing', !!chat.typing); }
@@ -1710,6 +2408,19 @@ function createApp(opts){
     }).catch(function(){ msg.textContent = 'Chưa lưu được – kiểm tra mạng hoặc quyền ghi nút "' + PASS_NODE + '" trên Firebase.'; }).then(function(){ b.disabled = false; });
   };
 
+  /* đổi mật khẩu người chủ trì (cần mật khẩu quản trị) */
+  $('hpSave').onclick = function(){
+    var a = $('hpAdmin').value, n = $('hpNew').value.trim(), msg = $('hpMsg'), b = this;
+    if(hashPw(a) !== PASS_ADMIN){ msg.textContent = 'Mật khẩu quản trị chưa đúng.'; $('hpAdmin').focus(); return; }
+    if(n.length < 6){ msg.textContent = 'Mật khẩu chủ trì mới cần từ 6 ký tự.'; $('hpNew').focus(); return; }
+    b.disabled = true; msg.textContent = 'Đang lưu lên Firebase…';
+    fbSend('host', 'PUT', { hash:hashPw(n), ts:{'.sv':'timestamp'} }).then(function(){
+      hostHashP = null; store('hostH', ''); store('hostK', '');
+      $('hpAdmin').value = ''; $('hpNew').value = '';
+      msg.textContent = '✅ Đã lưu. Lần mở cuộc họp tiếp theo người chủ trì dùng mật khẩu mới.';
+    }).catch(function(){ msg.textContent = 'Chưa lưu được – kiểm tra mạng hoặc quyền ghi nút "' + PASS_NODE + '".'; }).then(function(){ b.disabled = false; });
+  };
+
   /* ---------- kết nối giữa các thành viên ---------- */
   // Chỉ tạo khung hình khi người đó THẬT SỰ có mặt (đã gửi tên hoặc đã có hình) → không có khung "ma"
   function getPeer(id){
@@ -1722,6 +2433,9 @@ function createApp(opts){
     var t = makeTile(pr.id); pr.tile = t.tile; pr.video = t.video;
     if(prefs.spk && pr.video.setSinkId) pr.video.setSinkId(prefs.spk).catch(noop);
     renderTile(pr.tile, pr.state, false);
+    pr.tile.classList.toggle('host', !!pr.host);
+    pr.tile.querySelector('.kbtn').classList.toggle('hidden', !isHost || !!pr.host);
+    applyOut(pr);
     if(pr.stream){ pr.video.srcObject = pr.stream; attachLevel(pr, pr.stream); playV(pr.video); }
     updateCount(); layout(); tuneSenders();
   }
@@ -1795,7 +2509,17 @@ function createApp(opts){
       pr.stream = s;
       if(!pr.tile) showTile(pr);
       else if(pr.video.srcObject !== s){ pr.video.srcObject = s; attachLevel(pr, s); }
+      applyOut(pr);
       playV(pr.video);
+      // bộ đệm tiếng nhỏ: mạng chập chờn vẫn nghe liền, không đứt đoạn
+      try{
+        var pc0 = call.peerConnection;
+        if(AUDIO_BUFFER > 0 && pc0 && pc0.getReceivers) pc0.getReceivers().forEach(function(r){
+          if(!r.track || r.track.kind !== 'audio') return;
+          if('jitterBufferTarget' in r) r.jitterBufferTarget = AUDIO_BUFFER;
+          else if('playoutDelayHint' in r) r.playoutDelayHint = AUDIO_BUFFER / 1000;
+        });
+      }catch(_){}
       setTimeout(tuneSenders, 800);
     });
     var gone = function(){
@@ -1925,9 +2649,10 @@ function createApp(opts){
       }).catch(noop);
     });
   }
-  function removePeer(id, lost){
+  function removePeer(id, lost, silent){
     var pr = peers[id]; if(!pr) return;
-    delete peers[id]; delete sentView[id];
+    delete peers[id]; delete sentView[id]; delete nearHist[id];
+    if(howlFrom === id) hideHowl();
     pr.conns.forEach(function(c){ try{ c.close(); }catch(_){} });
     if(pr.call){ pr.call.__dead = true; try{ pr.call.close(); }catch(_){} }
     try{ if(pr.src) pr.src.disconnect(); }catch(_){}
@@ -1935,17 +2660,58 @@ function createApp(opts){
     if(pr.tile) pr.tile.remove();
     if(dead) return;
     updateCount(); layout(); tuneSenders();
-    if(pr.known) toast(pr.state.name + (lost ? ' bị mất kết nối – đang nối lại…' : ' đã rời họp'));
+    if(pr.known && !silent) toast(pr.state.name + (lost ? ' bị mất kết nối – đang nối lại…' : ' đã rời họp'));
+  }
+  /* 2.0 CHỐNG TRÙNG NGƯỜI: mỗi "chỗ ngồi" (1 mã mời / 1 máy chủ trì) chỉ có 1 khung.
+     Lần vào sau (q lớn hơn) thắng; phiên cũ nhận lệnh 'dup' và tự rời họp. */
+  function newerThan(q1, id1, q2, id2){ return q1 !== q2 ? q1 > q2 : String(id1) > String(id2); }
+  function dedupe(id, pr){
+    if(!pr.key) return false;
+    if(pr.key === myKey){
+      if(newerThan(pr.seq, id, mySeq, peer ? peer.id : '')){
+        forcedOut('Bạn vừa vào họp ở ' + (isHost ? 'máy / tab khác' : 'máy / tab khác bằng cùng mã mời') + ' – phiên này đã tự rời để không bị trùng người.');
+        return true;
+      }
+      sendTo(id, { t:'dup', k:myKey, q:mySeq, id:peer ? peer.id : '' });
+      setTimeout(function(){ removePeer(id, false, true); }, 200);
+      return true;
+    }
+    var gone = false;
+    Object.keys(peers).forEach(function(oid){
+      var o = peers[oid]; if(gone || oid === id || o.key !== pr.key) return;
+      var oldId = newerThan(pr.seq, id, o.seq, oid) ? oid : id, newId = oldId === id ? oid : id;
+      sendTo(oldId, { t:'dup', k:pr.key, q:peers[newId].seq, id:newId });
+      removePeer(oldId, false, true);
+      if(oldId === id) gone = true;
+    });
+    return gone;
   }
   function onData(id, d){
     var pr = peers[id]; if(!pr || !d || dead) return;
     if(d.t === 'bye'){ removePeer(id); return; }
     if(d.t === 'view'){ var w = +d.w; pr.viewW = w >= 0 ? w : undefined; tuneSenders(); return; }
+    if(d.t === 'dup'){
+      if(d.k === myKey && newerThan(+d.q || 0, d.id || '', mySeq, peer ? peer.id : ''))
+        forcedOut('Bạn vừa vào họp ở máy / tab khác – phiên này đã tự rời để không bị trùng người.');
+      return;
+    }
+    if(d.t === 'kick'){ if(pr.host) forcedOut('Người chủ trì đã mời bạn rời cuộc họp.', true); return; }
+    if(d.t === 'end'){ if(pr.host) forcedOut('Người chủ trì đã kết thúc cuộc họp.', true); return; }
+    if(d.t === 'kicked'){
+      if(!pr.host) return;
+      if(d.k === myKey){ forcedOut('Người chủ trì đã mời bạn rời cuộc họp.', true); return; }
+      Object.keys(peers).forEach(function(oid){ if(peers[oid].key === d.k) removePeer(oid, false, true); });
+      return;
+    }
+    if(d.t === 'howl'){ onHowl(id, pr); return; }
     if(d.t === 'state'){
       var was = pr.state, first = !pr.known;
       pr.known = true;
+      pr.key = String(d.k || ''); pr.seq = +d.q || 0; pr.host = !!d.h;
+      if(dedupe(id, pr)) return;
       pr.state = { name:String(d.name || '').slice(0, 30) || was.name, mic:!!d.mic, cam:!!d.cam, share:!!d.share };
       if(!pr.tile) showTile(pr); else renderTile(pr.tile, pr.state, false);
+      if(pr.tile){ pr.tile.classList.toggle('host', pr.host); pr.tile.querySelector('.kbtn').classList.toggle('hidden', !isHost || pr.host); }
       if(first && Date.now() - joinedAt > 4000){ joinChime(); toast('👋 ' + pr.state.name + ' đã vào họp'); if(minimized) btn.classList.add('talk'); }
       if(!first && pr.state.mic && !was.mic) beep([740], 0.05);
       if(pr.state.share !== was.share){
@@ -1992,7 +2758,19 @@ function createApp(opts){
     mx.onclick = function(e){ e.stopPropagation(); if(zoomable(tile)) goFull(tile); else toggleMax(tile); };
     var zh = document.createElement('div'); zh.className = 'zoomHint';
     var rs = document.createElement('div'); rs.className = 'rs'; rs.title = 'Kéo để đổi cỡ';
-    tile.appendChild(v); tile.appendChild(av); tile.appendChild(tag); tile.appendChild(wk); tile.appendChild(lb); tile.appendChild(zh); tile.appendChild(mx); tile.appendChild(rs);
+    var ht = document.createElement('span'); ht.className = 'hostTag'; ht.textContent = '⭐'; lb.insertBefore(ht, n);
+    var nt = document.createElement('div'); nt.className = 'nearTag'; nt.textContent = '🏢 Ngồi gần · đã tắt tiếng trên máy này';
+    var sb = document.createElement('button'); sb.className = 'sbtn'; sb.type = 'button'; sb.textContent = '🔊'; sb.title = 'Tắt / bật tiếng người này trên máy bạn';
+    sb.onclick = function(e){ e.stopPropagation(); var pr = peers[id]; if(!pr) return; if(pr.near || pr.mute){ pr.near = false; pr.mute = false; pr.nearOff = true; } else pr.mute = true; applyOut(pr); };
+    var kb = document.createElement('button'); kb.className = 'kbtn hidden'; kb.type = 'button'; kb.textContent = 'Mời ra'; kb.title = 'Người chủ trì: mời người này rời cuộc họp';
+    kb.onclick = function(e){
+      e.stopPropagation();
+      if(!kb.classList.contains('arm')){ kb.classList.add('arm'); kb.textContent = 'Chắc chắn?'; setTimeout(function(){ kb.classList.remove('arm'); kb.textContent = 'Mời ra'; }, 3000); return; }
+      kickPeer(id);
+    };
+    [sb, kb].forEach(function(x){ x.addEventListener('pointerdown', function(e){ e.stopPropagation(); }); });
+    if(id === 'me') tile.classList.add('me');
+    tile.appendChild(v); tile.appendChild(av); tile.appendChild(tag); tile.appendChild(wk); tile.appendChild(nt); tile.appendChild(lb); tile.appendChild(zh); tile.appendChild(sb); tile.appendChild(kb); tile.appendChild(mx); tile.appendChild(rs);
     var W = stage.clientWidth || 640, H = stage.clientHeight || 400;
     setRect(tile, W / 2 - 120, H / 2 - 68, 240);
     stage.appendChild(tile);
@@ -2281,8 +3059,22 @@ function createApp(opts){
   }, true);
 
   /* ---------- các nút khác ---------- */
+  var camOpening = false;
   $('btnCam').onclick = function(){
-    if(!rawCam){ toast('Máy này chưa có camera hoặc chưa cấp quyền camera.'); return; }
+    if(!rawCam || rawCam.readyState === 'ended'){                 // lúc vào chưa mở được camera → xin mở lại ngay khi bấm
+      if(camOpening) return; camOpening = true;
+      gum({video: cons(VBASE, prefs.cam)}).catch(function(){ return gum({video:true}); }).then(function(s){
+        camOpening = false;
+        if(dead){ s.getTracks().forEach(function(t){ t.stop(); }); return; }
+        rawCam = s.getVideoTracks()[0]; hasCam = true; camOn = true;
+        updatePipeline(); refreshDevices(); refreshLocal(); broadcast(); tuneSenders();
+        toast('Đã mở camera.');
+      }, function(e){
+        camOpening = false;
+        toast(e && e.name === 'NotAllowedError' ? 'Camera đang bị chặn: bấm 🔒 / ⓘ cạnh địa chỉ trang → Cho phép camera.' : 'Không mở được camera (có thể ứng dụng khác đang dùng).');
+      });
+      return;
+    }
     camOn = !camOn; rawCam.enabled = camOn; camTrack.enabled = camOn;
     refreshLocal(); broadcast();
   };
@@ -2573,7 +3365,7 @@ function createApp(opts){
     leave: teardown,
     isJoined: function(){ return joined; },
     isOpen: function(){ return !minimized; },
-    status: function(){ return { joined:joined, minimized:minimized, float:pipOut ? 'window' : (minimized && joined ? 'page' : 'off'), slot:mySlot, people:tileCount() + (joined ? 1 : 0), mic:micOn, cam:camOn, bg:bgMode, mobile:IS_MOBILE }; }
+    status: function(){ return { role:isHost ? 'host' : (INVITE ? 'guest' : 'open'), seat:myKey, meet:meetId ? meetHash(meetId).slice(0, 6) : '', spkOff:prefs.spkOff, near:Object.keys(peers).filter(function(k){ return peers[k].near; }).map(function(k){ return peers[k].state.name; }), joined:joined, minimized:minimized, float:pipOut ? 'window' : (minimized && joined ? 'page' : 'off'), slot:mySlot, people:tileCount() + (joined ? 1 : 0), mic:micOn, cam:camOn, bg:bgMode, mobile:IS_MOBILE }; }
   };
 }
 
