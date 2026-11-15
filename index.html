@@ -33,7 +33,7 @@
   window.IDECO_MEET_REQUIRE_PASS = true;
 </script>
 <!-- ============================================================================
- IDECO:BEGIN S049 | VIDEO CALL NỘI BỘ (IDECO Meet 2.0 · bản nhúng) — 13/11/2026
+ IDECO:BEGIN S049 | VIDEO CALL NỘI BỘ (IDECO Meet 2.2 · bản nhúng) — 15/11/2026
  VỊ TRÍ: CUỐI FILE, ngay trước </body> (sau SALES_AGENT_EMBED).
  - Nút nhỏ màu đỏ "Video call" ở góc phải, ngay TRÊN nút "Ứng dụng".
    Bấm → popup nhập tên → Vào họp. Camera/micro CHỈ mở khi nhân viên bấm nút.
@@ -67,7 +67,7 @@
    kể cả khi chat đang mở; tin của chính tab gửi không tự báo lại.
  - MỚI 2.0 — NGƯỜI CHỦ TRÌ + MÃ MỜI (bật/tắt: INVITE_ONLY):
    · Người chủ trì: ở màn hình vào họp chọn "⭐ Tôi là người chủ trì", nhập mật khẩu chủ trì
-     (mặc định = mật khẩu quản trị; đổi trong ⚙️ Cài đặt). Máy đã đăng nhập thì lần sau không hỏi lại.
+     (mặc định do quản trị đặt riêng, khác mật khẩu mở ứng dụng; đổi trong ⚙️ Cài đặt bằng mật khẩu chủ trì hiện tại). Máy đã đăng nhập thì lần sau không hỏi lại.
    · Trong phòng bấm "🔑 Mã mời" → mỗi lần bấm "Tạo mã" ra 1 mã 6 ký tự cho 1 người → Sao chép / Gửi qua Zalo.
      Danh sách mã cho biết ai đã vào, có nút Thu hồi; người chủ trì mời ra được từng người và Kết thúc họp.
    · Người được mời: chọn "🔑 Tôi có mã mời", nhập tên + mã → Vào họp. Bấm link trong lời mời thì mã tự điền.
@@ -82,6 +82,20 @@
    · Bộ đệm tiếng 100 ms cho mạng 4G chập chờn → tiếng liền, không đứt đoạn; chống vọng giảm nhẹ, không giật.
  - SỬA 2.0 — ĐIỆN THOẠI: camera xem trước hiện ngay sau khi nhập mật khẩu (tự phát lại hình khi trình duyệt
    chặn tự phát; chạm 1 lần vào màn hình là hiện). Nút Camera trong phòng tự xin mở lại camera nếu lúc đầu chưa mở được.
+ - MỚI 2.0 — NÚT "👥 n người" (góc trên): danh sách người đang họp — chủ trì chọn tên → "Mời ra";
+   ai cũng tắt tiếng riêng được từng người (🔇) và có nút "Rời họp" ngay đầu danh sách.
+ - MỚI 2.0 — CHIA SẺ MÀN HÌNH mượt hơn: 1–2 người xem 24 hình/giây, đông người tự giảm để không nghẽn mạng;
+   mạng yếu thì giảm nhẹ cả nét lẫn khung hình thay vì đứng hình.
+ - MỚI 2.1 — CÓ TIN NHẮN MỚI: chuông 2 hồi to hơn + RUNG (Android) + popup như cũ. Đã sửa lỗi điện thoại không kêu
+   (trình duyệt chặn tiếng khi chưa chạm màn hình: nay tự mở khoá ở lần chạm đầu tiên).
+   Nút 🔕/🔔 trên đầu khung chat: bật THÔNG BÁO của máy — đang dùng app khác / tắt màn hình mà app chưa bị đóng
+   thì vẫn hiện thông báo, rung, reo theo cài đặt điện thoại. iPhone: phải "Thêm vào Màn hình chính" (iOS 16.4+).
+   Lưu ý: app đã ĐÓNG HẲN thì không báo được (cần máy chủ gửi thông báo đẩy – chưa có).
+ - MỚI 2.2 — CHAT TOÀN MÀN HÌNH TRÊN MỌI THIẾT BỊ: bấm 💬 (nút nổi hoặc "💬 Chat" trong phòng họp) là khung chat phủ kín màn hình,
+   cả máy tính lẫn điện thoại/PWA. Màn rộng: nội dung chat nằm giữa (rộng tối đa 960px) cho dễ đọc. Thu nhỏ bằng nút "⌄ Thu nhỏ"
+   hoặc phím Esc. Muốn máy tính quay lại khung chat nhỏ: đặt CHAT_FULLSCREEN = false (dòng cấu hình phía trên).
+ - MỚI 2.1 — CHAT TRÊN ĐIỆN THOẠI: mở khung chat là TOÀN MÀN HÌNH (chữ, nút to, dễ bấm), khung tự co theo bàn phím;
+   nút "⌄ Thu nhỏ" ở góc trên thu khung chat về lại nút 💬 (tin nhắn vẫn giữ nguyên, có tin mới vẫn báo).
  - MỚI 2.0 — CHAT: mỗi tin có nút riêng: tin của mình "↩ Thu hồi", tin người khác "🗑 Xoá" (bấm 2 lần để chắc chắn);
    tin biến mất trên mọi máy, popup của tin đó cũng tự tắt. Nút 🗑 trên đầu khung vẫn xoá hết như cũ.
  - MỚI 2.0 — ĐÍNH KÈM FILE trong chat: nút 📎 (hoặc kéo-thả, hoặc Ctrl+V ảnh chụp màn hình) gửi ảnh, Excel, Word,
@@ -121,6 +135,7 @@ var CHAT_TYPING      = true;        // báo "đang nhập" nhấp nháy trên m�
 var CHAT_TYPING_TEXT = true;
 var FILE_MAX_MB   = 10;             // 2.0: đính kèm ảnh / Excel / Word / PDF trong chat — dung lượng tối đa mỗi file
 var FILE_DAYS     = 7;              // file tự xoá trên Firebase sau số ngày này        // true = hiện luôn nội dung đang gõ · false = chỉ hiện "đang nhập…"
+var CHAT_FULLSCREEN = true;         // 2.2: bấm 💬 là mở khung chat TOÀN MÀN HÌNH trên MỌI thiết bị (máy tính, điện thoại, PWA). false = máy tính dùng khung nhỏ như bản cũ
 /* Mật khẩu vào ứng dụng — CHỈ dùng cho trang website (ideco-meet.html đặt window.IDECO_MEET_REQUIRE_PASS = true).
    Mật khẩu hiện hành lưu trên Firebase (dạng mã băm) tại PASS_NODE/pass; chưa có thì dùng mã băm mặc định bên dưới. */
 var REQUIRE_PASS  = window.IDECO_MEET_REQUIRE_PASS === true;
@@ -129,6 +144,7 @@ var PASS_DEFAULT  = '1939ebfec73b53bede8c81672a2a16dcf0f9b838977dd5ebd072c9cf6f9
 var PASS_ADMIN    = 'e52cbc685513fad1f6298738dfdaff1abc0bd7ec839129e25c03d6d8e65bb1a3';   // mã băm của mật khẩu quản trị (dùng khi đổi mật khẩu)
 /* Người chủ trì + mã mời (mới 2.0). Dữ liệu lưu trong PASS_NODE trên CHAT_DB: host (mật khẩu chủ trì, mã băm),
    room_<ROOM> (cuộc họp đang mở, đã mã hoá), inv_<ROOM>/… (mã mời, chỉ lưu mã băm). */
+var HOST_DEFAULT  = 'e3d10aef7e72b85935c08707fbf8225aaf3bb05eb4ed07b98d59b3f5ca702a8a';   // mã băm mật khẩu chủ trì mặc định (riêng, KHÁC mật khẩu mở ứng dụng)
 var INVITE_ONLY   = true;           // true = vào họp phải có mã mời do người chủ trì tạo · false = như bản cũ, ai cũng vào được
 var MEET_KEEP_MS  = 4 * 3600000;    // chủ trì vào lại trong 4 giờ → tiếp tục cuộc họp cũ (mã mời cũ vẫn dùng được)
 var MEET_URL      = '';             // link gửi kèm mã mời ('' = trang đang mở). Ví dụ: 'https://ten.github.io/ideco-meet/'
@@ -206,9 +222,9 @@ function fbSend(sub, method, body, keepalive){
 }
 function uiErr(m){ var e = new Error(m); e.ui = true; return e; }
 var hostHashP = null;
-function hostHash(force){                                     // mật khẩu chủ trì hiện hành (mã băm); chưa đặt thì = mật khẩu quản trị
+function hostHash(force){                                     // mật khẩu chủ trì hiện hành (mã băm); chưa đặt thì = HOST_DEFAULT
   if(hostHashP && !force) return hostHashP;
-  hostHashP = fbGet('host').then(function(d){ return (d && /^[0-9a-f]{64}$/.test(d.hash || '')) ? d.hash : PASS_ADMIN; }, function(){ hostHashP = null; throw uiErr('Chưa đọc được mật khẩu chủ trì (mất mạng?). Thử lại sau giây lát.'); });
+  hostHashP = fbGet('host').then(function(d){ return (d && /^[0-9a-f]{64}$/.test(d.hash || '')) ? d.hash : HOST_DEFAULT; }, function(){ hostHashP = null; throw uiErr('Chưa đọc được mật khẩu chủ trì (mất mạng?). Thử lại sau giây lát.'); });
   return hostHashP;
 }
 var pendingCode = '';                                         // mở từ link mời: …#ma=ABC123
@@ -434,6 +450,17 @@ var CSS = [
 '.tile.near .nearTag{display:block}',
 '.tile .hostTag{display:none;margin-right:4px}',
 '.tile.host .hostTag{display:inline}',
+'.pbtn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 11px;cursor:pointer;font-weight:600;color:#1a2232}',
+'.pbtn:hover{border-color:#c5ccd8}',
+'.pplList{display:flex;flex-direction:column;gap:6px;margin-top:10px;max-height:60dvh;overflow:auto}',
+'.ppl{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:8px 10px}',
+'.ppl .av{flex:none;width:34px;height:34px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800}',
+'.ppl .nm{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+'.ppl .nm small{display:block;color:var(--muted);font-weight:500;font-size:12px}',
+'.ppl button{flex:none;border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 10px;cursor:pointer;font-weight:700;font-size:12.5px}',
+'.ppl button.kick{color:var(--red2);border-color:#f5c2c4;background:#fdecec}',
+'.ppl button.kick.arm{background:var(--red);color:#fff}',
+'.ppl button.lv{background:var(--red);border-color:var(--red);color:#fff}',
 '.howlBar{position:absolute;left:50%;top:12px;transform:translateX(-50%);z-index:7;width:min(520px,calc(100% - 24px));background:#fff4d6;border:1px solid #f0c860;color:#5a4200;border-radius:14px;padding:10px 12px;font-size:13.5px;font-weight:600;box-shadow:0 10px 28px rgba(26,34,50,.18);text-align:center}',
 '.howlBar button{margin:8px 4px 0;border:0;border-radius:9px;padding:8px 12px;font-weight:700;cursor:pointer}',
 '.howlBar .hb1{background:var(--red);color:#fff}',
@@ -464,6 +491,35 @@ var CSS = [
 '.chatHd{flex:none;display:flex;align-items:center;gap:8px;padding:8px 8px 8px 14px;background:#d71920;color:#fff;font-weight:700}',
 '.chatHd small{font-weight:500;font-size:11.5px;opacity:.92}',
 '.chatHd .sp{flex:1}',
+'.chatHd .mn{display:none}',
+/* 2.1: điện thoại → khung chat toàn màn hình */
+'.chat.full{left:0;right:0;top:0;bottom:auto;width:auto;height:100dvh;border:0;border-radius:0;box-shadow:none;font-size:16px;animation:chatFullIn .16s ease-out}',
+'@keyframes chatFullIn{from{opacity:0}to{opacity:1}}',
+'.chat.full .chatHd{padding:calc(10px + env(safe-area-inset-top,0px)) 10px 10px 16px;font-size:17px}',
+'.chat.full .chatHd{white-space:nowrap;gap:6px}',
+'.chat.full .chatHd small{font-size:12px;min-width:0;overflow:hidden;text-overflow:ellipsis}',
+'.chat.full .chatHd button{width:40px;height:38px;font-size:16px;border-radius:10px}',
+'.chat.full .chatHd .x{display:none}',
+'.chat.full .chatHd .mn{display:block;width:auto;padding:0 12px;font-weight:700;font-size:14.5px;background:#fff;color:#d71920}',
+'.chat.full .chatLs{padding:12px;gap:9px}',
+'.chat.full .cm .tx{font-size:16px}',
+'.chat.full .cm .who{font-size:12.5px}',
+'.chat.full .cm .cdel{font-size:12.5px;padding:4px 0 4px 10px}',
+'.chat.full .chatFt{padding:10px 10px calc(10px + env(safe-area-inset-bottom,0px))}',
+'.chat.full .chatFt input[type=text]{font-size:16px;padding:12px 13px}',
+'.chat.full .chatFt .att{width:48px;font-size:21px}',
+'.chat.full .chatFt .send{padding:0 18px;font-size:16px}',
+'.chat.full .chatFt .chip{font-size:13.5px;padding:7px 13px}',
+'.chat.full .cm .cimg{max-height:240px}',
+/* 2.2: màn hình rộng (máy tính / máy tính bảng) → nội dung chat nằm giữa, rộng vừa phải để dễ đọc; thanh tiêu đề và ô nhập vẫn full chiều ngang */
+'@media(min-width:900px){',
+'.chat.full .chatHd{padding-left:max(16px,calc((100% - 960px)/2));padding-right:max(10px,calc((100% - 960px)/2))}',
+'.chat.full .chatLs{padding:16px max(12px,calc((100% - 960px)/2));gap:11px}',
+'.chat.full .chatFt,.chat.full .chatTy,.chat.full .chatErr,.chat.full .chatCf{padding-left:max(12px,calc((100% - 960px)/2));padding-right:max(12px,calc((100% - 960px)/2))}',
+'.chat.full .cm{max-width:min(78%,720px)}',
+'.chat.full .cm .tx{font-size:16.5px;line-height:1.5}',
+'.chat.full .cm .cimg{max-height:360px}',
+'}',
 '.chatHd button{flex:none;border:0;background:rgba(255,255,255,.22);color:#fff;width:30px;height:28px;border-radius:8px;cursor:pointer;font-size:13px;padding:0}',
 '.chatLs{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:10px;background:#f3f5f9;display:flex;flex-direction:column;gap:7px}',
 '.cm{max-width:86%;align-self:flex-start;background:#fff;border:1px solid #e1e6ee;border-radius:12px 12px 12px 4px;padding:5px 10px 6px}',
@@ -580,16 +636,16 @@ var HTML = '' +
     '<div class="pwRow"><input type="password" data-r="pwNew" placeholder="Mật khẩu mới (từ 6 ký tự)" autocomplete="new-password"><button class="eye" type="button" aria-label="Hiện mật khẩu">👁</button></div>' +
     '<button class="btn sm" data-r="pwSave" type="button">💾 Lưu lên Firebase để áp dụng</button><div class="note" data-r="pwMsg"></div></div>' +
    '<div class="pwBox' + (INVITE ? '' : ' hidden') + '"><label class="f">⭐ Đổi mật khẩu người chủ trì</label>' +
-    '<div class="pwRow"><input type="password" data-r="hpAdmin" placeholder="Mật khẩu quản trị" autocomplete="off"><button class="eye" type="button" aria-label="Hiện mật khẩu">👁</button></div>' +
+    '<div class="pwRow"><input type="password" data-r="hpAdmin" placeholder="Mật khẩu chủ trì hiện tại (hoặc mật khẩu quản trị)" autocomplete="off"><button class="eye" type="button" aria-label="Hiện mật khẩu">👁</button></div>' +
     '<div class="pwRow"><input type="password" data-r="hpNew" placeholder="Mật khẩu chủ trì mới (từ 6 ký tự)" autocomplete="new-password"><button class="eye" type="button" aria-label="Hiện mật khẩu">👁</button></div>' +
-    '<button class="btn sm" data-r="hpSave" type="button">💾 Lưu mật khẩu chủ trì</button><div class="note" data-r="hpMsg">Chưa đổi thì mật khẩu chủ trì = mật khẩu quản trị.</div></div>' +
+    '<button class="btn sm" data-r="hpSave" type="button">💾 Lưu mật khẩu chủ trì</button><div class="note" data-r="hpMsg">Đổi xong, các máy chủ trì phải nhập mật khẩu mới.</div></div>' +
   '</div>' +
  '</div></details>' +
 '</div></div>' +
 '<div class="room">' +
  '<div class="top">' +
   '<div class="brand"><span class="ideco">IDECO</span><span class="meet">Meet</span></div>' +
-  '<span class="info"><span data-r="count">1</span> người</span><span class="sp"></span>' +
+  '<button class="info pbtn" data-r="btnPeople" type="button" title="Danh sách người đang họp">👥 <span data-r="count">1</span> người</button><span class="sp"></span>' +
   '<button class="btn sm hidden" data-r="btnFlip" type="button" title="Đổi camera trước / sau">🔄 <span>Đổi cam</span></button>' +
   '<button class="btn sm" data-r="btnChat" type="button" title="Chat nhóm – nhắn tin cho mọi người đang mở ERP">💬 <span>Chat</span><b class="cbadge hidden" data-r="chatBadge"></b></button>' +
   '<button class="btn sm' + (INVITE ? ' hidden' : '') + '" data-r="btnInvite" type="button" title="Viết lời mời họp – hiện popup nhấp nháy trên ERP của mọi người">📣 <span>Mời</span></button>' +
@@ -614,6 +670,8 @@ var HTML = '' +
   '<button class="ctl leave" data-r="btnLeave" type="button"><i>📞</i><span>Rời họp</span></button>' +
  '</div>' +
  '<div class="setModal hidden" data-r="setModal"><div class="mcard"><div class="mhead">Cài đặt <button data-r="btnSetClose" type="button" aria-label="Đóng">✕</button></div><div data-r="setSlotRoom"></div></div></div>' +
+ '<div class="setModal hidden" data-r="pplModal"><div class="mcard"><div class="mhead">👥 Người đang họp <button data-r="pplClose" type="button" aria-label="Đóng">✕</button></div>' +
+  '<div class="note" data-r="pplNote"></div><div class="pplList" data-r="pplList"></div></div></div>' +
  '<div class="setModal hidden" data-r="invModal"><div class="mcard"><div class="mhead">🔑 Mời vào họp <button data-r="invClose" type="button" aria-label="Đóng">✕</button></div>' +
   '<div class="note">Mỗi lần bấm <b>Tạo mã</b> ra 1 mã cho <b>1 người</b>. Gửi lời mời qua Zalo; người đó nhập tên + mã để vào. ' +
    'Cùng 1 mã vào ở máy khác thì máy cũ tự rời – không bị trùng người.</div>' +
@@ -673,9 +731,11 @@ function boot(){
      '<div class="mb"><button class="go" type="button">Vào họp</button><button class="re" type="button">Trả lời</button></div></div>' +
     '<div class="chat hidden" role="dialog" aria-label="Chat nhóm IDECO Meet">' +
      '<div class="chatHd">💬 Chat nhóm <small class="cs"></small><span class="sp"></span>' +
+      '<button class="nt" type="button" title="Bật thông báo tin nhắn trên máy này" aria-label="Thông báo tin nhắn">🔕</button>' +
       '<button class="rf" type="button" title="Tải lại tin nhắn" aria-label="Tải lại tin nhắn">🔄</button>' +
       '<button class="cl" type="button" title="Xoá lịch sử chat" aria-label="Xoá lịch sử chat">🗑</button>' +
-      '<button class="x" type="button" aria-label="Đóng khung chat">✕</button></div>' +
+      '<button class="x" type="button" aria-label="Đóng khung chat">✕</button>' +
+      '<button class="mn" type="button" aria-label="Thu nhỏ khung chat">⌄ Thu nhỏ</button></div>' +
      '<div class="chatLs"></div><div class="chatErr hidden"></div>' +
      '<div class="chatCf hidden">Xoá toàn bộ tin nhắn trên MỌI máy?<button class="y" type="button">Xoá hết</button><button class="n" type="button">Không</button></div>' +
      '<div class="chatTy hidden"></div>' +
@@ -759,17 +819,69 @@ function namesText(list){
   var n = list.map(function(p){ return p.name; });
   return n.length <= 3 ? n.join(', ') : n.slice(0, 3).join(', ') + ' và ' + (n.length - 3) + ' người khác';
 }
+/* 2.1: CHUÔNG + RUNG + THÔNG BÁO khi có tin mới.
+   Điện thoại chỉ cho phát tiếng sau lần chạm đầu tiên → giữ 1 bộ phát âm dùng chung, "mở khoá" ngay lần chạm đầu. */
+var ringAC = null;
+function ringCtx(){
+  var AC = window.AudioContext || window.webkitAudioContext; if(!AC) return null;
+  if(!ringAC || ringAC.state === 'closed'){ try{ ringAC = new AC(); }catch(_){ return null; } }
+  if(ringAC.state === 'suspended' && ringAC.resume) ringAC.resume().catch(noop);
+  return ringAC;
+}
+function ringUnlock(){
+  var c = ringCtx(); if(!c) return;
+  if(c.state === 'running'){ ['pointerdown', 'touchend', 'keydown'].forEach(function(e){ document.removeEventListener(e, ringUnlock, true); }); return; }
+  try{ var b = c.createBuffer(1, 1, 22050), s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); s.start(0); }catch(_){}   // iPhone: phát 1 mẫu im lặng để mở khoá
+}
+['pointerdown', 'touchend', 'keydown'].forEach(function(e){ document.addEventListener(e, ringUnlock, true); });
 function ring(){
   try{
-    var AC = window.AudioContext || window.webkitAudioContext; if(!AC) return;
-    var c = new AC(), t = c.currentTime + 0.05;
-    [660, 880, 1100, 880].forEach(function(f, i){
-      var o = c.createOscillator(), g = c.createGain(), st = t + i * 0.16;
-      o.frequency.value = f; g.gain.setValueAtTime(0.0001, st); g.gain.linearRampToValueAtTime(0.1, st + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, st + 0.15);
-      o.connect(g); g.connect(c.destination); o.start(st); o.stop(st + 0.16);
+    var c = ringCtx(); if(!c) return;
+    var t = c.currentTime + 0.05;
+    [0, 0.75].forEach(function(rep){                       // chuông 2 hồi cho dễ nghe
+      [660, 880, 1100, 880].forEach(function(f, i){
+        var o = c.createOscillator(), g = c.createGain(), st = t + rep + i * 0.15;
+        o.type = 'triangle'; o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, st); g.gain.linearRampToValueAtTime(0.22, st + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, st + 0.16);
+        o.connect(g); g.connect(c.destination); o.start(st); o.stop(st + 0.17);
+      });
     });
-    setTimeout(function(){ try{ c.close(); }catch(_){} }, 1200);
   }catch(_){}
+  buzz();
+}
+function buzz(){ try{ if(navigator.vibrate && store('vib') !== '0') navigator.vibrate([220, 120, 220, 120, 400]); }catch(_){} }   // Android rung; iPhone không hỗ trợ
+function notifSupported(){ return 'Notification' in window; }
+function notifOn(){ return notifSupported() && Notification.permission === 'granted' && store('notif') !== '0'; }
+function notifIcon(){ var l = document.querySelector('link[rel="apple-touch-icon"],link[rel="icon"]'); return l ? l.href : undefined; }
+function sysNotify(who, text){
+  if(!notifOn() || !document.hidden) return;               // đang xem trang thì đã có popup + chuông
+  var opt = { body:text, tag:'ideco-meet-chat', renotify:true, vibrate:[220, 120, 220, 120, 400], icon:notifIcon(), badge:notifIcon(), data:{ url:location.href } };
+  var plain = function(){ try{ var n = new Notification('💬 ' + who, opt); n.onclick = function(){ try{ window.focus(); }catch(_){} chatOpen(); n.close(); }; }catch(_){} };
+  if(navigator.serviceWorker && navigator.serviceWorker.getRegistration)
+    navigator.serviceWorker.getRegistration().then(function(r){ if(r && r.showNotification) r.showNotification('💬 ' + who, opt); else plain(); }, plain);
+  else plain();
+}
+function notifBtnSync(){
+  var b = chatEl && chatEl.querySelector('.chatHd .nt'); if(!b) return;
+  var on = notifOn();
+  b.textContent = on ? '🔔' : '🔕';
+  b.title = on ? 'Đang bật thông báo tin nhắn (bấm để tắt)' : 'Bật thông báo tin nhắn trên máy này';
+}
+function notifToggle(){
+  ringUnlock();
+  if(!notifSupported()){
+    toast(IS_IOS ? 'iPhone: hãy "Thêm vào Màn hình chính" rồi mở app từ biểu tượng đó (iOS 16.4 trở lên) mới bật được thông báo. Khi đang mở app vẫn có chuông.' : 'Trình duyệt này không hỗ trợ thông báo. Khi đang mở trang vẫn có chuông.', 7000);
+    return;
+  }
+  if(Notification.permission === 'granted'){
+    store('notif', notifOn() ? '0' : '1'); notifBtnSync();
+    toast(notifOn() ? '🔔 Đã bật thông báo tin nhắn trên máy này.' : '🔕 Đã tắt thông báo tin nhắn (vẫn có chuông khi đang mở trang).');
+    return;
+  }
+  if(Notification.permission === 'denied'){ toast('Thông báo đang bị chặn: bấm 🔒 / ⓘ cạnh địa chỉ trang → Thông báo → Cho phép.', 7000); return; }
+  var p = Notification.requestPermission(function(r){ done(r); });
+  function done(r){ if(r === 'granted'){ store('notif', '1'); toast('🔔 Đã bật thông báo: có tin mới, máy sẽ rung / reo và hiện thông báo.'); buzz(); } notifBtnSync(); }
+  if(p && p.then) p.then(done);
 }
 function renderPresence(){
   pres.listeners.forEach(function(f){ try{ f(); }catch(_){} });
@@ -860,7 +972,21 @@ function chatBoot(){
   chatIn.addEventListener('input', chatTypingPing);
   chatIn.addEventListener('blur', function(){ setTimeout(function(){ if(!chatIn.value.trim()) chatTypingStop(); }, 200); });
   window.addEventListener('pagehide', chatTypingStop);
+  document.addEventListener('keydown', function(e){          // 2.2: phím Esc → đóng ảnh xem lớn / hộp xác nhận / thu nhỏ khung chat toàn màn hình
+    if(e.key !== 'Escape' || !chat.open || e.isComposing) return;
+    var lbx = sroot.querySelector('.lbox');
+    if(lbx && !lbx.classList.contains('hidden')){ lbx.querySelector('.lbX').click(); return; }
+    if(chatCf && !chatCf.classList.contains('hidden')){ chatCf.classList.add('hidden'); return; }
+    chatClose();
+  });
   chatEl.querySelector('.chatHd .x').onclick = chatClose;
+  chatEl.querySelector('.chatHd .mn').onclick = chatClose;
+  chatEl.querySelector('.chatHd .nt').onclick = notifToggle;
+  notifBtnSync();
+  // 2.1: điện thoại — khung toàn màn hình co theo bàn phím (iPhone không tự co 100dvh khi bàn phím mở)
+  var vv = window.visualViewport;
+  if(vv){ vv.addEventListener('resize', chatFit); vv.addEventListener('scroll', chatFit); }
+  window.addEventListener('resize', chatFit);
   chatEl.querySelector('.chip').onclick = function(){ chatCompose(chatInviteText()); };
   chatSendBtn.onclick = chatSend;
   chatIn.addEventListener('keydown', function(e){ if(e.key === 'Enter' && !e.isComposing){ e.preventDefault(); chatSend(); } });
@@ -924,7 +1050,7 @@ function chatPoll(){
     if(chat.es || !chat.on) return;
     chat.pollN++;
     if(chat.pollN >= 75){ chat.pollT = null; chat.fails = 0; chatConnect(); return; }   // ~5 phút: thử nối lại luồng thời gian thực
-    chat.pollT = setTimeout(chatPoll, chat.denied ? 30000 : (document.hidden ? 12000 : 4000));
+    chat.pollT = setTimeout(chatPoll, chat.denied ? 30000 : (document.hidden ? 12000 : (chat.open ? 2000 : 4000)));   // dự phòng khi mạng chặn luồng thời gian thực
   });
 }
 function chatShowErr(){
@@ -974,7 +1100,7 @@ function chatPop(key, isNew){
   void msgPop.offsetWidth;
   msgPop.style.animation = '';
   btn.classList.add('alert'); titleBlink(''); titleBlink(who);
-  if(isNew) ring();
+  if(isNew){ ring(); sysNotify(who, text); }
 }
 function chatPopHide(){ if(msgPop) msgPop.classList.add('hidden'); if(btn) btn.classList.remove('alert'); titleBlink(''); }
 function chatMarkSeen(){
@@ -1003,10 +1129,25 @@ function chatOpen(){
   chat.open = true; hideBubble();
   chatName.classList.toggle('hidden', !!(store('name') || '').trim());
   chatEl.classList.remove('hidden');
+  chatFit(); notifBtnSync();
   chatRender(true); chatLs.scrollTop = chatLs.scrollHeight;
   chatMarkSeen(); typRender();
   if(!chat.es && !chat.pollT) chatConnect();
+  else if(!chat.es && chat.pollT && chat.mode === 'poll') chatPoll();   // mạng chặn luồng thời gian thực: đọc tin ngay khi mở khung
   if(!IS_MOBILE) setTimeout(function(){ try{ (chatName.classList.contains('hidden') ? chatIn : chatName).focus(); }catch(_){} }, 30);
+}
+function chatIsFull(){ return CHAT_FULLSCREEN || IS_MOBILE || window.innerWidth <= 600; }
+function chatFit(){
+  if(!chatEl) return;
+  var full = chat.open && chatIsFull();
+  chatEl.classList.toggle('full', full);
+  var vv = window.visualViewport;
+  if(full && vv){
+    var atEnd = chatLs.scrollHeight - chatLs.scrollTop - chatLs.clientHeight < 60;
+    chatEl.style.height = Math.round(vv.height) + 'px';
+    chatEl.style.top = Math.round(vv.offsetTop) + 'px';
+    if(atEnd) chatLs.scrollTop = chatLs.scrollHeight;              // bàn phím mở: tin mới nhất vẫn nằm ngay trên ô nhập
+  }else{ chatEl.style.height = ''; chatEl.style.top = ''; }
 }
 function chatClose(){ chat.open = false; if(chatEl) chatEl.classList.add('hidden'); if(chatCf) chatCf.classList.add('hidden'); chatTypingStop(); chatBadge(); typRender(); }
 function chatToggle(){ if(chat.open) chatClose(); else chatOpen(); }
@@ -1592,9 +1733,9 @@ function createApp(opts){
       for(L = 0; L <= 6; L++) echo = Math.max(echo, corrLead(rs, ms, L));     // tiếng vọng từ loa chính máy mình (đi sau)
       pr.lead = lead; pr.leadAt = Date.now();
       var micHears = stdOf(ms) > 0.004;
-      if(lead > 0.6 && lead > echo + 0.08 && micHears){ pr.nearHits = (pr.nearHits || 0) + 1; pr.farHits = 0; }
+      if(lead > 0.65 && lead > echo + 0.1 && micHears){ pr.nearHits = (pr.nearHits || 0) + 1; pr.farHits = 0; }
       else{ pr.nearHits = Math.max(0, (pr.nearHits || 0) - 1); if(pr.near && lead < 0.25) pr.farHits = (pr.farHits || 0) + 1; }
-      if(!pr.near && !pr.nearOff && pr.nearHits >= 2){
+      if(!pr.near && !pr.nearOff && pr.nearHits >= 3){   // phải chắc 3 lần liền mới tắt → không tắt nhầm người ở xa
         pr.near = true; applyOut(pr);
         toast('🏢 Bạn đang ngồi gần ' + pr.state.name + ' – đã tự tắt tiếng ' + pr.state.name + ' trên máy này để không hú (bạn vẫn nghe trực tiếp).', 7000);
       }else if(pr.near && pr.farHits >= 8){
@@ -1614,7 +1755,7 @@ function createApp(opts){
     if(mx > -38 && mx - avg > 32){                      // 1 âm đơn rất to nổi hẳn lên
       if(Math.abs(ix - howl.idx) <= 1) howl.n++; else { howl.idx = ix; howl.n = 1; }
     }else howl.n = 0;
-    if(howl.n >= 22 && Date.now() > howl.until){       // kéo dài ~0,7 giây → đang hú
+    if(howl.n >= 25 && Date.now() > howl.until){       // kéo dài ~0,7 giây → đang hú
       howl.n = 0; howl.until = Date.now() + 8000;
       setMic(false, false);
       broadcast({ t:'howl', name:myName });
@@ -2277,6 +2418,38 @@ function createApp(opts){
   $('btnInvite2').onclick = function(){ if(INVITE) openCodes(); else invite(); };
   $('btnCodes').onclick = openCodes;
 
+  /* ---------- 2.0: danh sách người họp — chọn tên để mời ra (chủ trì), tắt tiếng riêng, hoặc tự rời họp ---------- */
+  function pplRender(){
+    var box = $('pplList'); box.innerHTML = '';
+    $('pplNote').textContent = isHost ? 'Bạn là người chủ trì: bấm "Mời ra" cạnh tên để mời người đó rời họp (mã mời của họ bị thu hồi).'
+                                      : 'Bấm 🔇 để tắt tiếng riêng người đó trên máy bạn (ví dụ khi ngồi gần nhau).';
+    var row = function(name, sub, btns){
+      var r = document.createElement('div'); r.className = 'ppl';
+      r.innerHTML = '<span class="av">' + esc((name.trim()[0] || '?').toUpperCase()) + '</span><span class="nm">' + esc(name) + '<small>' + sub + '</small></span>';
+      btns.forEach(function(b){ r.appendChild(b); }); box.appendChild(r);
+    };
+    var mk = function(txt, cls, fn){ var b = document.createElement('button'); b.type = 'button'; b.textContent = txt; if(cls) b.className = cls; b.onclick = fn; return b; };
+    var lv = mk('Rời họp', 'lv', function(){ $('pplModal').classList.add('hidden'); $('btnLeave').click(); });
+    row(myName + ' (bạn)', (isHost ? '⭐ Chủ trì · ' : '') + (micOn ? '🎤 đang mở mic' : '🔇 mic tắt'), [lv]);
+    Object.keys(peers).filter(function(id){ return peers[id].tile; })
+      .sort(function(a, b){ return (peers[b].host ? 1 : 0) - (peers[a].host ? 1 : 0) || String(peers[a].state.name).localeCompare(peers[b].state.name, 'vi'); })
+      .forEach(function(id){
+        var pr = peers[id], st = pr.state, btns = [];
+        btns.push(mk((pr.mute || pr.near) ? '🔇' : '🔊', '', function(){ if(pr.near || pr.mute){ pr.near = false; pr.mute = false; pr.nearOff = true; } else pr.mute = true; applyOut(pr); pplRender(); }));
+        if(isHost && !pr.host){
+          var k = mk('Mời ra', 'kick', function(){
+            if(!k.classList.contains('arm')){ k.classList.add('arm'); k.textContent = 'Chắc chắn?'; setTimeout(function(){ if(k.isConnected){ k.classList.remove('arm'); k.textContent = 'Mời ra'; } }, 3000); return; }
+            kickPeer(id); setTimeout(pplRender, 400);
+          });
+          btns.push(k);
+        }
+        row(st.name, (pr.host ? '⭐ Chủ trì · ' : '') + (st.mic ? '🎤 đang nói được' : '🔇 mic tắt') + (st.share ? ' · 🖥️ đang chia sẻ' : '') + (pr.near ? ' · 🏢 ngồi gần' : ''), btns);
+      });
+  }
+  $('btnPeople').onclick = function(){ $('invModal').classList.add('hidden'); $('setModal').classList.add('hidden'); pplRender(); $('pplModal').classList.remove('hidden'); };
+  $('pplClose').onclick = function(){ $('pplModal').classList.add('hidden'); };
+  $('pplModal').addEventListener('click', function(e){ if(e.target === this) this.classList.add('hidden'); });
+
   /* ---------- 2.0: bảng mã mời của người chủ trì ---------- */
   var invData = {}, lastCode = null;
   function inviteLink(code){ return (MEET_URL || location.href.split('#')[0]) + '#ma=' + code; }
@@ -2298,6 +2471,7 @@ function createApp(opts){
   }
   function openCodes(){
     if(!isHost) return;
+    $('pplModal').classList.add('hidden'); $('setModal').classList.add('hidden');
     $('invModal').classList.remove('hidden');
     $('invMsg').textContent = '';
     invLoad();
@@ -2411,14 +2585,16 @@ function createApp(opts){
   /* đổi mật khẩu người chủ trì (cần mật khẩu quản trị) */
   $('hpSave').onclick = function(){
     var a = $('hpAdmin').value, n = $('hpNew').value.trim(), msg = $('hpMsg'), b = this;
-    if(hashPw(a) !== PASS_ADMIN){ msg.textContent = 'Mật khẩu quản trị chưa đúng.'; $('hpAdmin').focus(); return; }
     if(n.length < 6){ msg.textContent = 'Mật khẩu chủ trì mới cần từ 6 ký tự.'; $('hpNew').focus(); return; }
-    b.disabled = true; msg.textContent = 'Đang lưu lên Firebase…';
-    fbSend('host', 'PUT', { hash:hashPw(n), ts:{'.sv':'timestamp'} }).then(function(){
+    b.disabled = true; msg.textContent = 'Đang kiểm tra…';
+    hostHash(true).then(function(cur){
+      if(hashPw(a) !== cur && hashPw(a) !== PASS_ADMIN) throw uiErr('Mật khẩu chủ trì hiện tại chưa đúng.');
+      msg.textContent = 'Đang lưu lên Firebase…';
+      return fbSend('host', 'PUT', { hash:hashPw(n), ts:{'.sv':'timestamp'} }).then(function(){
       hostHashP = null; store('hostH', ''); store('hostK', '');
       $('hpAdmin').value = ''; $('hpNew').value = '';
       msg.textContent = '✅ Đã lưu. Lần mở cuộc họp tiếp theo người chủ trì dùng mật khẩu mới.';
-    }).catch(function(){ msg.textContent = 'Chưa lưu được – kiểm tra mạng hoặc quyền ghi nút "' + PASS_NODE + '".'; }).then(function(){ b.disabled = false; });
+    }); }).catch(function(e){ msg.textContent = (e && e.ui) ? e.message : 'Chưa lưu được – kiểm tra mạng hoặc quyền ghi nút "' + PASS_NODE + '".'; if(e && e.ui) $('hpAdmin').focus(); }).then(function(){ b.disabled = false; });
   };
 
   /* ---------- kết nối giữa các thành viên ---------- */
@@ -2581,13 +2757,14 @@ function createApp(opts){
           return;
         }
         applyParams(s, function(p){
-          p.degradationPreference = screenTrack ? 'maintain-resolution' : 'balanced';   // camera: giữ cân bằng nét/mượt
+          p.degradationPreference = 'balanced';   // 2.0: mạng yếu thì giảm nhẹ cả nét lẫn khung hình → không đứng hình giật cục   // camera: giữ cân bằng nét/mượt
           p.encodings.forEach(function(e){
             if(pr.viewW === 0){ e.active = false; return; }      // người xem đang thu nhỏ: tạm ngừng gửi hình cho họ
             e.active = true;
             if(screenTrack){
-              var sb = n <= 2 ? 2500000 : n <= 4 ? 1800000 : 1200000;
-              e.maxBitrate = sb; e.maxFramerate = n >= 5 ? 10 : 15;
+              // 2.0: ít người → 24 hình/giây (cuộn trang, video mượt); đông người → giảm để máy chia sẻ không nghẽn mạng
+              var sb = n <= 1 ? 3500000 : n <= 2 ? 2800000 : n <= 4 ? 1800000 : 1100000;
+              e.maxBitrate = sb; e.maxFramerate = n <= 2 ? 24 : n <= 4 ? 15 : 10;
               e.scaleResolutionDownBy = sw > 1920 ? Math.round(sw / 1920 * 100) / 100 : 1;   // giữ đủ độ nét để người xem phóng to
               return;
             }
@@ -3016,6 +3193,7 @@ function createApp(opts){
   function updateCount(){
     var n = tileCount();
     $('count').textContent = n + 1;
+    if(!$('pplModal').classList.contains('hidden')) pplRender();
     $('wait').classList.toggle('hidden', !joined || n > 0);
     pipState();
   }
@@ -3091,7 +3269,7 @@ function createApp(opts){
     if(screenTrack){ stopShare(); return; }
     navigator.mediaDevices.getDisplayMedia({
       // tối đa Full HD, 15 khung/giây: chữ nét mà máy không bị nặng → hết giật
-      video:{ width:{max:1920}, height:{max:1080}, frameRate:{ideal:15, max:15} },
+      video:{ width:{max:1920}, height:{max:1080}, frameRate:{ideal:24, max:30} },   // 2.0: mượt hơn khi cuộn / chiếu video
       audio:false,
       selfBrowserSurface:'exclude',    // không cho chọn chính tab đang họp (nguyên nhân lặp hình)
       surfaceSwitching:'include', systemAudio:'exclude', monitorTypeSurfaces:'include'
@@ -3435,6 +3613,7 @@ if(document.body) boot(); else document.addEventListener('DOMContentLoaded', boo
 })();
 </script>
 <!-- IDECO:END S049 | VIDEO CALL NỘI BỘ -->
+
 
 <script>
   // Trang họp riêng: mở ngay màn hình nhập tên

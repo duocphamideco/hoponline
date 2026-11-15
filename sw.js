@@ -22,3 +22,13 @@ self.addEventListener('fetch', event => {
     )
   ));
 });
+// IDECO Meet 2.1: bấm vào thông báo tin nhắn → mở lại app đang chạy (hoặc mở mới)
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || scope;
+  event.waitUntil((async () => {
+    const list = await self.clients.matchAll({ type:'window', includeUncontrolled:true });
+    for (const c of list) { if (c.url.startsWith(scope) && 'focus' in c) return c.focus(); }
+    if (self.clients.openWindow) return self.clients.openWindow(url);
+  })());
+});
