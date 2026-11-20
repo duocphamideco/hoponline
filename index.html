@@ -33,7 +33,7 @@
   window.IDECO_MEET_REQUIRE_PASS = true;
 </script>
 <!-- ============================================================================
- IDECO:BEGIN S049 | VIDEO CALL NỘI BỘ (IDECO Meet 2.2 · bản nhúng) — 15/11/2026
+ IDECO:BEGIN S049 | VIDEO CALL NỘI BỘ (IDECO Meet 2.1 · bản nhúng) — 14/11/2026
  VỊ TRÍ: CUỐI FILE, ngay trước </body> (sau SALES_AGENT_EMBED).
  - Nút nhỏ màu đỏ "Video call" ở góc phải, ngay TRÊN nút "Ứng dụng".
    Bấm → popup nhập tên → Vào họp. Camera/micro CHỈ mở khi nhân viên bấm nút.
@@ -91,11 +91,12 @@
    Nút 🔕/🔔 trên đầu khung chat: bật THÔNG BÁO của máy — đang dùng app khác / tắt màn hình mà app chưa bị đóng
    thì vẫn hiện thông báo, rung, reo theo cài đặt điện thoại. iPhone: phải "Thêm vào Màn hình chính" (iOS 16.4+).
    Lưu ý: app đã ĐÓNG HẲN thì không báo được (cần máy chủ gửi thông báo đẩy – chưa có).
- - MỚI 2.2 — CHAT TOÀN MÀN HÌNH TRÊN MỌI THIẾT BỊ: bấm 💬 (nút nổi hoặc "💬 Chat" trong phòng họp) là khung chat phủ kín màn hình,
-   cả máy tính lẫn điện thoại/PWA. Màn rộng: nội dung chat nằm giữa (rộng tối đa 960px) cho dễ đọc. Thu nhỏ bằng nút "⌄ Thu nhỏ"
-   hoặc phím Esc. Muốn máy tính quay lại khung chat nhỏ: đặt CHAT_FULLSCREEN = false (dòng cấu hình phía trên).
  - MỚI 2.1 — CHAT TRÊN ĐIỆN THOẠI: mở khung chat là TOÀN MÀN HÌNH (chữ, nút to, dễ bấm), khung tự co theo bàn phím;
    nút "⌄ Thu nhỏ" ở góc trên thu khung chat về lại nút 💬 (tin nhắn vẫn giữ nguyên, có tin mới vẫn báo).
+ - MỚI 2.2 — THẢ CẢM XÚC vào tin nhắn: bấm nút ☺ cạnh mỗi tin (hoặc bấm đúp vào tin = ❤️) để chọn
+   👍 Thích · ❤️ Tim · 😂 Cười · 😮 Ngạc nhiên · 😢 Buồn · 😡 Giận · 1️⃣ Số 1 · 🎉 Chúc mừng · 🙏 Cảm ơn · ✅ Đã xong.
+   Mỗi người 1 cảm xúc/tin (bấm lại để bỏ, chọn cái khác để đổi); hiện số đếm dưới tin, rê chuột xem ai đã thả.
+   Ai thả cảm xúc vào tin của bạn → máy bạn hiện thông báo nhỏ. Lưu ở  ideco_meet_chat/<ROOM>/<tin>/rx  (không cần mở thêm quyền).
  - MỚI 2.0 — CHAT: mỗi tin có nút riêng: tin của mình "↩ Thu hồi", tin người khác "🗑 Xoá" (bấm 2 lần để chắc chắn);
    tin biến mất trên mọi máy, popup của tin đó cũng tự tắt. Nút 🗑 trên đầu khung vẫn xoá hết như cũ.
  - MỚI 2.0 — ĐÍNH KÈM FILE trong chat: nút 📎 (hoặc kéo-thả, hoặc Ctrl+V ảnh chụp màn hình) gửi ảnh, Excel, Word,
@@ -135,7 +136,6 @@ var CHAT_TYPING      = true;        // báo "đang nhập" nhấp nháy trên m�
 var CHAT_TYPING_TEXT = true;
 var FILE_MAX_MB   = 10;             // 2.0: đính kèm ảnh / Excel / Word / PDF trong chat — dung lượng tối đa mỗi file
 var FILE_DAYS     = 7;              // file tự xoá trên Firebase sau số ngày này        // true = hiện luôn nội dung đang gõ · false = chỉ hiện "đang nhập…"
-var CHAT_FULLSCREEN = true;         // 2.2: bấm 💬 là mở khung chat TOÀN MÀN HÌNH trên MỌI thiết bị (máy tính, điện thoại, PWA). false = máy tính dùng khung nhỏ như bản cũ
 /* Mật khẩu vào ứng dụng — CHỈ dùng cho trang website (ideco-meet.html đặt window.IDECO_MEET_REQUIRE_PASS = true).
    Mật khẩu hiện hành lưu trên Firebase (dạng mã băm) tại PASS_NODE/pass; chưa có thì dùng mã băm mặc định bên dưới. */
 var REQUIRE_PASS  = window.IDECO_MEET_REQUIRE_PASS === true;
@@ -493,8 +493,7 @@ var CSS = [
 '.chatHd .sp{flex:1}',
 '.chatHd .mn{display:none}',
 /* 2.1: điện thoại → khung chat toàn màn hình */
-'.chat.full{left:0;right:0;top:0;bottom:auto;width:auto;height:100dvh;border:0;border-radius:0;box-shadow:none;font-size:16px;animation:chatFullIn .16s ease-out}',
-'@keyframes chatFullIn{from{opacity:0}to{opacity:1}}',
+'.chat.full{left:0;right:0;top:0;bottom:auto;width:100vw;height:100dvh;border:0;border-radius:0;box-shadow:none;font-size:16px}',
 '.chat.full .chatHd{padding:calc(10px + env(safe-area-inset-top,0px)) 10px 10px 16px;font-size:17px}',
 '.chat.full .chatHd{white-space:nowrap;gap:6px}',
 '.chat.full .chatHd small{font-size:12px;min-width:0;overflow:hidden;text-overflow:ellipsis}',
@@ -511,15 +510,6 @@ var CSS = [
 '.chat.full .chatFt .send{padding:0 18px;font-size:16px}',
 '.chat.full .chatFt .chip{font-size:13.5px;padding:7px 13px}',
 '.chat.full .cm .cimg{max-height:240px}',
-/* 2.2: màn hình rộng (máy tính / máy tính bảng) → nội dung chat nằm giữa, rộng vừa phải để dễ đọc; thanh tiêu đề và ô nhập vẫn full chiều ngang */
-'@media(min-width:900px){',
-'.chat.full .chatHd{padding-left:max(16px,calc((100% - 960px)/2));padding-right:max(10px,calc((100% - 960px)/2))}',
-'.chat.full .chatLs{padding:16px max(12px,calc((100% - 960px)/2));gap:11px}',
-'.chat.full .chatFt,.chat.full .chatTy,.chat.full .chatErr,.chat.full .chatCf{padding-left:max(12px,calc((100% - 960px)/2));padding-right:max(12px,calc((100% - 960px)/2))}',
-'.chat.full .cm{max-width:min(78%,720px)}',
-'.chat.full .cm .tx{font-size:16.5px;line-height:1.5}',
-'.chat.full .cm .cimg{max-height:360px}',
-'}',
 '.chatHd button{flex:none;border:0;background:rgba(255,255,255,.22);color:#fff;width:30px;height:28px;border-radius:8px;cursor:pointer;font-size:13px;padding:0}',
 '.chatLs{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:10px;background:#f3f5f9;display:flex;flex-direction:column;gap:7px}',
 '.cm{max-width:86%;align-self:flex-start;background:#fff;border:1px solid #e1e6ee;border-radius:12px 12px 12px 4px;padding:5px 10px 6px}',
@@ -530,6 +520,30 @@ var CSS = [
 '.cm .cdel{border:0;background:transparent;color:#98a1b3;font-size:11px;font-weight:700;cursor:pointer;padding:0 0 0 8px;opacity:.75}',
 '.cm .cdel:hover{color:#b5121a;opacity:1}',
 '.cm .cdel.arm{color:#fff;background:#d71920;border-radius:6px;padding:1px 6px;margin-left:6px;opacity:1}',
+/* 2.2: thả cảm xúc */
+'.cm{position:relative}',
+'.cm .crx{border:0;background:transparent;color:#98a1b3;font-size:13px;line-height:1;cursor:pointer;padding:0 0 0 8px;opacity:.75;vertical-align:-1px}',
+'.cm .crx:hover,.cm .crx.on{opacity:1;color:#b5121a}',
+'.cm .rxs{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}',
+'.cm.me .rxs{justify-content:flex-end}',
+'.cm .rxc{display:inline-flex;align-items:center;gap:3px;border:1px solid #e1e6ee;background:#fff;border-radius:999px;padding:1px 7px 1px 5px;font:600 12px/18px system-ui,Arial,sans-serif;color:#475066;cursor:pointer;transition:transform .12s}',
+'.cm .rxc:hover{transform:scale(1.08)}',
+'.cm .rxc.mine{background:#fdecec;border-color:#f19ca0;color:#b5121a}',
+'.cm .rxc i{font-style:normal;font-size:14px}',
+'.cm .rxc.pop{animation:rxPop .45s ease}',
+'@keyframes rxPop{0%{transform:scale(.4)}60%{transform:scale(1.35)}100%{transform:scale(1)}}',
+'.rxBar{display:flex;flex-wrap:wrap;width:max-content;max-width:100%;box-sizing:border-box;margin-top:6px;gap:2px;padding:4px 6px;background:#fff;border:1px solid #e1e6ee;border-radius:999px;box-shadow:0 6px 20px rgba(20,30,50,.18);animation:rxIn .16s ease}',
+'.cm.me .rxBar{margin-left:auto}',
+'.rxBar button{border:0;background:transparent;font-size:21px;line-height:1;width:32px;height:32px;border-radius:50%;cursor:pointer;padding:0;transition:transform .12s,background .12s}',
+'.rxBar button:hover{transform:scale(1.3) translateY(-2px);background:#f3f5f9}',
+'.rxBar button.on{background:#fdecec}',
+'@keyframes rxIn{from{opacity:0;transform:translateY(6px) scale(.9)}to{opacity:1;transform:none}}',
+'.rxFly{position:absolute;z-index:4;pointer-events:none;font-size:26px;animation:rxFly .9s ease-out forwards}',
+'@keyframes rxFly{0%{opacity:0;transform:translateY(0) scale(.5)}20%{opacity:1;transform:translateY(-6px) scale(1.3)}100%{opacity:0;transform:translateY(-46px) scale(1)}}',
+'.chat.full .cm .crx{font-size:16px;padding:4px 2px 4px 10px}',
+'.chat.full .cm .rxc{font-size:13.5px;line-height:22px}',
+'.chat.full .rxBar{justify-content:center}',
+'.chat.full .rxBar button{width:40px;height:40px;font-size:25px}',
 '.chatEmpty{margin:auto;text-align:center;color:#667189;font-size:13px;padding:10px}',
 '.chatErr{flex:none;background:#fff7ed;color:#9a3412;font-size:12px;padding:6px 12px;border-top:1px solid #fed7aa}',
 '.chatFt{flex:none;display:flex;flex-direction:column;gap:6px;padding:8px;border-top:1px solid #e1e6ee;background:#fff}',
@@ -951,8 +965,22 @@ function chatBoot(){
   chatEl.querySelector('.rf').onclick = chatRefresh;
   chatLs.addEventListener('click', function(e){
     var b = e.target.closest ? e.target.closest('.cdel') : null; if(b){ chatDelOne(b); return; }
+    var r = e.target.closest ? e.target.closest('[data-rx]') : null;
+    if(r){ e.stopPropagation(); rxToggle(r.getAttribute('data-k'), r.getAttribute('data-rx'), r); return; }
+    var o = e.target.closest ? e.target.closest('.crx') : null;
+    if(o){ e.stopPropagation(); var k0 = o.getAttribute('data-k'); chat.pick = chat.pick === k0 ? '' : k0; chatRender();
+      var bar = chatLs.querySelector('.rxBar'); if(bar && bar.scrollIntoView) try{ bar.scrollIntoView({ block:'nearest', behavior:'smooth' }); }catch(_){}
+      return; }
+    if(chat.pick && !(e.target.closest && e.target.closest('.rxBar'))){ chat.pick = ''; chatRender(); }
     var f = e.target.closest ? e.target.closest('[data-f]') : null; if(f) fileOpen(f.getAttribute('data-f'), f);
   });
+  chatLs.addEventListener('dblclick', function(e){                // 2.2: bấm đúp vào tin = thả ❤️
+    if(e.target.closest && e.target.closest('button,img,.rxBar,.rxs')) return;
+    var c = e.target.closest ? e.target.closest('.cm[data-k]') : null; if(!c) return;
+    try{ var sel = window.getSelection && window.getSelection(); if(sel) sel.removeAllRanges(); }catch(_){}
+    rxToggle(c.getAttribute('data-k'), '❤️', null, true);
+  });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && chat.pick){ chat.pick = ''; chatRender(); } });
   var att = chatEl.querySelector('.att'), cfIn = chatEl.querySelector('.cfIn');
   att.onclick = function(){ cfIn.value = ''; cfIn.click(); };
   cfIn.onchange = function(){ var f = this.files && this.files[0]; if(f) fileSend(f); };
@@ -972,13 +1000,6 @@ function chatBoot(){
   chatIn.addEventListener('input', chatTypingPing);
   chatIn.addEventListener('blur', function(){ setTimeout(function(){ if(!chatIn.value.trim()) chatTypingStop(); }, 200); });
   window.addEventListener('pagehide', chatTypingStop);
-  document.addEventListener('keydown', function(e){          // 2.2: phím Esc → đóng ảnh xem lớn / hộp xác nhận / thu nhỏ khung chat toàn màn hình
-    if(e.key !== 'Escape' || !chat.open || e.isComposing) return;
-    var lbx = sroot.querySelector('.lbox');
-    if(lbx && !lbx.classList.contains('hidden')){ lbx.querySelector('.lbX').click(); return; }
-    if(chatCf && !chatCf.classList.contains('hidden')){ chatCf.classList.add('hidden'); return; }
-    chatClose();
-  });
   chatEl.querySelector('.chatHd .x').onclick = chatClose;
   chatEl.querySelector('.chatHd .mn').onclick = chatClose;
   chatEl.querySelector('.chatHd .nt').onclick = notifToggle;
@@ -1011,7 +1032,16 @@ function chatApply(path, data, isPatch){
       if(data === null) delete chat.msgs[id];
       else if(isPatch && chat.msgs[id] && typeof data === 'object'){ Object.keys(data).forEach(function(k){ chat.msgs[id][k] = data[k]; }); }
       else chat.msgs[id] = data;
-    }else{ if(!chat.msgs[id] || typeof chat.msgs[id] !== 'object') chat.msgs[id] = {}; chat.msgs[id][seg[1]] = data; }
+    }else{
+      if(!chat.msgs[id] || typeof chat.msgs[id] !== 'object') chat.msgs[id] = {};
+      var o = chat.msgs[id];
+      for(var i = 1; i < seg.length - 1; i++){ if(!o[seg[i]] || typeof o[seg[i]] !== 'object') o[seg[i]] = {}; o = o[seg[i]]; }
+      var last = seg[seg.length - 1];
+      if(data === null) delete o[last];
+      else if(isPatch && o[last] && typeof o[last] === 'object' && typeof data === 'object'){ Object.keys(data).forEach(function(k){ if(data[k] === null) delete o[last][k]; else o[last][k] = data[k]; }); }
+      else o[last] = data;
+      if(seg[1] === 'rx') rxNotify(id, seg[2], data);
+    }
   }
   chatChanged();
 }
@@ -1118,11 +1148,70 @@ function chatRender(stick){
   }
   chatLs.innerHTML = chat.keys.map(function(k){
     var m = chat.msgs[k], me = chatMine(k);
-    return '<div class="cm' + (me ? ' me' : '') + '"><div class="who">' + esc(me ? 'Bạn' : String(m.name || 'Đồng nghiệp').slice(0, 30)) + ' · ' + chatTime(m.ts) +
+    return '<div class="cm' + (me ? ' me' : '') + '" data-k="' + esc(k) + '"><div class="who">' + esc(me ? 'Bạn' : String(m.name || 'Đồng nghiệp').slice(0, 30)) + ' · ' + chatTime(m.ts) +
+      '<button class="crx' + (chat.pick === k ? ' on' : '') + '" type="button" data-k="' + esc(k) + '" title="Thả cảm xúc (hoặc bấm đúp vào tin = ❤️)" aria-label="Thả cảm xúc">☺</button>' +
       '<button class="cdel" type="button" data-k="' + esc(k) + '" title="' + (me ? 'Thu hồi tin này trên mọi máy' : 'Xoá riêng tin này trên mọi máy') + '">' + (me ? '↩ Thu hồi' : '🗑 Xoá') + '</button>' +
-      '</div>' + chatFileHtml(m) + (m.file && m.text === '📎 ' + m.file.n ? '' : '<div class="tx">' + esc(String(m.text).slice(0, 300)) + '</div>') + '</div>';
+      '</div>' + chatFileHtml(m) + (m.file && m.text === '📎 ' + m.file.n ? '' : '<div class="tx">' + esc(String(m.text).slice(0, 300)) + '</div>') + rxHtml(k, m) + '</div>';
   }).join('');
   if(stick || near) chatLs.scrollTop = chatLs.scrollHeight;
+}
+/* ---- 2.2: THẢ CẢM XÚC ----  CHAT_NODE/ROOM/<tin>/rx/<mã máy> = { e:'❤️', n:'Tên', ts } — mỗi máy 1 cảm xúc / tin */
+var RX_LIST = [['👍','Thích'],['❤️','Tim'],['😂','Cười'],['😮','Ngạc nhiên'],['😢','Buồn'],['😡','Giận'],['1️⃣','Số 1'],['🎉','Chúc mừng'],['🙏','Cảm ơn'],['✅','Đã xong']];
+function rxOk(e){ return RX_LIST.some(function(x){ return x[0] === e; }); }
+function rxHtml(k, m){
+  var rx = m.rx && typeof m.rx === 'object' ? m.rx : {}, g = {}, order = [];
+  Object.keys(rx).forEach(function(c){
+    var v = rx[c]; if(!v || typeof v !== 'object' || !rxOk(v.e)) return;
+    if(!g[v.e]){ g[v.e] = { n:[], mine:false }; order.push(v.e); }
+    g[v.e].n.push(c === chat.cid ? 'Bạn' : String(v.n || 'Đồng nghiệp').slice(0, 30));
+    if(c === chat.cid) g[v.e].mine = true;
+  });
+  order.sort(function(a, b){ return g[b].n.length - g[a].n.length; });
+  var h = order.length ? '<div class="rxs">' + order.map(function(e){
+    return '<button class="rxc' + (g[e].mine ? ' mine' : '') + (chat.rxPop === k + e ? ' pop' : '') + '" type="button" data-k="' + esc(k) + '" data-rx="' + esc(e) + '" title="' + esc(g[e].n.join(', ')) + (g[e].mine ? ' — bấm để bỏ' : ' — bấm để thả cùng') + '"><i>' + e + '</i>' + g[e].n.length + '</button>';
+  }).join('') + '</div>' : '';
+  if(chat.pick === k){
+    var cur = rx[chat.cid] && rx[chat.cid].e;
+    h += '<div class="rxBar" role="toolbar" aria-label="Chọn cảm xúc">' + RX_LIST.map(function(x){
+      return '<button type="button" class="' + (cur === x[0] ? 'on' : '') + '" data-k="' + esc(k) + '" data-rx="' + x[0] + '" title="' + x[1] + '">' + x[0] + '</button>';
+    }).join('') + '</div>';
+  }
+  return h;
+}
+function rxFly(k, e){
+  var c = chatLs && chatLs.querySelector('.cm[data-k="' + (window.CSS && CSS.escape ? CSS.escape(k) : k) + '"]'); if(!c) return;
+  var f = document.createElement('span'); f.className = 'rxFly'; f.textContent = e;
+  f.style.left = Math.max(4, c.offsetWidth / 2 - 13) + 'px'; f.style.top = '0px';
+  c.appendChild(f); setTimeout(function(){ if(f.parentNode) f.parentNode.removeChild(f); }, 950);
+}
+function rxToggle(k, e, el, dbl){
+  var m = chat.msgs[k]; if(!m || !rxOk(e) || !chat.on) return;
+  var name = (store('name') || '').trim();
+  if(!name){ name = chatWho(); if(!name) return; }
+  if(!m.rx || typeof m.rx !== 'object') m.rx = {};
+  var cur = m.rx[chat.cid], off = !!(cur && cur.e === e);
+  if(dbl && off) return;                                        // bấm đúp khi đã thả ❤️ thì giữ nguyên
+  var prev = cur, val = off ? null : { e:e, n:name.slice(0, 30), ts:{'.sv':'timestamp'} };
+  if(off) delete m.rx[chat.cid]; else m.rx[chat.cid] = { e:e, n:name.slice(0, 30), ts:Date.now() };
+  chat.pick = ''; chat.rxPop = off ? '' : k + e;
+  chatRender();
+  if(!off) rxFly(k, e);
+  setTimeout(function(){ if(chat.rxPop === k + e) chat.rxPop = ''; }, 600);
+  fetch(CHAT_DB.replace(/\/+$/, '') + '/' + CHAT_NODE + '/' + ROOM + '/' + encodeURIComponent(k) + '/rx/' + encodeURIComponent(chat.cid) + '.json',
+    off ? { method:'DELETE', cache:'no-store' } : { method:'PUT', headers:{'Content-Type':'application/json'}, cache:'no-store', body:JSON.stringify(val) }).then(function(r){
+    if(r.status === 401 || r.status === 403){ chat.denied = true; chatShowErr(); }
+    if(!r.ok) throw new Error('http');
+  }).catch(function(){
+    var mm = chat.msgs[k]; if(mm){ if(!mm.rx || typeof mm.rx !== 'object') mm.rx = {}; if(prev) mm.rx[chat.cid] = prev; else delete mm.rx[chat.cid]; }
+    chatRender(); toast(chat.denied ? 'Firebase chưa cho phép ghi – cần mở quyền trong Rules.' : 'Chưa thả được cảm xúc – kiểm tra mạng rồi thử lại.');
+  });
+}
+function rxNotify(k, c, data){                                  // ai đó thả cảm xúc vào tin của mình → báo nhỏ
+  if(!chat.ready || !c || c === chat.cid || !chatMine(k)) return;
+  var v = data && typeof data === 'object' ? data : null; if(!v || !rxOk(v.e)) return;
+  var t = String(chat.msgs[k].text || '').slice(0, 40);
+  toast(String(v.n || 'Đồng nghiệp').slice(0, 30) + ' đã thả ' + v.e + ' vào tin của bạn: “' + t + (String(chat.msgs[k].text || '').length > 40 ? '…' : '') + '”');
+  if(chat.open) setTimeout(function(){ rxFly(k, v.e); }, 30);
 }
 function chatOpen(){
   if(!chat.on || !chatEl) return;
@@ -1136,7 +1225,7 @@ function chatOpen(){
   else if(!chat.es && chat.pollT && chat.mode === 'poll') chatPoll();   // mạng chặn luồng thời gian thực: đọc tin ngay khi mở khung
   if(!IS_MOBILE) setTimeout(function(){ try{ (chatName.classList.contains('hidden') ? chatIn : chatName).focus(); }catch(_){} }, 30);
 }
-function chatIsFull(){ return CHAT_FULLSCREEN || IS_MOBILE || window.innerWidth <= 600; }
+function chatIsFull(){ return IS_MOBILE || window.innerWidth <= 600; }
 function chatFit(){
   if(!chatEl) return;
   var full = chat.open && chatIsFull();
