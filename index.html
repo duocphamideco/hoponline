@@ -331,6 +331,7 @@ var CSS = [
 '.chk{display:flex;align-items:center;gap:9px;font-size:14px;margin-top:12px;cursor:pointer}',
 '.chk input{width:18px;height:18px;accent-color:var(--red);flex:none;margin:0}',
 '.chk small{color:var(--muted)}',
+'.voiceChk{background:var(--soft);border-radius:10px;padding:9px 11px;margin-top:10px;line-height:1.4}',
 '.btn{border:1px solid var(--line);background:#fff;padding:10px 14px;border-radius:10px;cursor:pointer;white-space:nowrap}',
 '.btn:hover{border-color:#c5ccd8}',
 '.btn.primary{display:block;width:100%;margin-top:14px;background:var(--red);border-color:var(--red);color:#fff;font-weight:700;font-size:17px;padding:13px}',
@@ -620,8 +621,9 @@ var HTML = '' +
   '<div data-r="hostPwWrap"><label class="f">Mật khẩu chủ trì</label>' +
    '<div class="pwRow"><input type="password" data-r="inHost" placeholder="Mật khẩu chủ trì" autocomplete="off"><button class="eye" type="button" aria-label="Hiện mật khẩu">👁</button></div></div>' +
   '<div class="note">Người chủ trì mở cuộc họp, rồi bấm <b>🔑 Mã mời</b> để tạo mã riêng cho từng người.</div></div>' +
- '<label class="chk"><input type="checkbox" data-r="chkMicOn"> Vào họp với micro bật sẵn <small>(mặc định: giữ nút để nói)</small></label>' +
- '<label class="chk"><input type="checkbox" data-r="chkSpkOff"> 🔇 Vào họp với loa tắt <small>(nhiều máy cùng 1 phòng: chỉ cần 1 máy mở loa)</small></label>' +
+ '<label class="chk voiceChk"><input type="checkbox" data-r="chkVoice"><span>📞 <b>Chỉ gọi thoại</b> – không bật camera<br><small>Vẫn chia sẻ màn hình được · tiết kiệm mạng, tiếng rõ hơn</small></span></label>' +
+ '<label class="chk"><input type="checkbox" data-r="chkMicOn"><span>Vào họp với micro bật sẵn <small>(mặc định: giữ nút để nói)</small></span></label>' +
+ '<label class="chk"><input type="checkbox" data-r="chkSpkOff"><span>🔇 Vào họp với loa tắt <small>(nhiều máy cùng 1 phòng: chỉ cần 1 máy mở loa)</small></span></label>' +
  '<button class="btn primary" data-r="btnJoin" type="button">Vào họp</button>' +
  '<button class="btn hidden" data-r="btnJoinInvite" type="button" style="display:block;width:100%;margin-top:8px;font-weight:700">📣 Mở cuộc họp & mời mọi người</button>' +
  '<div class="lmsg" data-r="lobbyMsg"></div>' +
@@ -1569,11 +1571,13 @@ function createApp(opts){
     bg: store('bg') || (IS_MOBILE ? 'none' : 'ideco'), bright: store('bright') !== null ? store('bright') !== '0' : !IS_MOBILE, beep: store('beep') !== '0',
     duck: store('duck') !== '0',
     micOnJoin: store('micOn') === '1',
-    spkOff: store('spkOff') === '1'
+    spkOff: store('spkOff') === '1',
+    voice: store('voice') === '1'          // 3.0: chế độ chỉ gọi thoại (không mở camera)
   };
   $('inName').value = store('name') || '';
   $('chkMicOn').checked = prefs.micOnJoin;
   $('chkSpkOff').checked = prefs.spkOff;
+  $('chkVoice').checked = prefs.voice;
   $('chkBeep').checked = prefs.beep;
   $('chkDuck').checked = prefs.duck;
   $('chkDuck').onchange = function(){ prefs.duck = this.checked; store('duck', prefs.duck ? '1' : '0'); };
@@ -1661,9 +1665,10 @@ function createApp(opts){
     rawCam = null; micTrack = null; meterTrack = null; mediaErr = '';
     var V = cons(VBASE, prefs.cam), A = cons(ABASE, prefs.mic);
     if(!prefs.cam) V.facingMode = 'user';
-    return gum({video:V, audio:A})
+    var first = prefs.voice ? gum({video:false, audio:A}) : gum({video:V, audio:A});   // 3.0: gọi thoại → không đụng tới camera
+    return first
       .catch(function(e){ mediaErr = (e && e.message === 'insecure') ? 'insecure' : (e && e.name) || 'x'; return gum({video:false, audio:A}); })
-      .catch(function(){ return gum({video:V, audio:false}); })
+      .catch(function(){ return prefs.voice ? null : gum({video:V, audio:false}); })
       .catch(function(){ return null; })
       .then(function(s){
         if(dead){ if(s) s.getTracks().forEach(function(t){ t.stop(); }); return; }
@@ -1681,6 +1686,8 @@ function createApp(opts){
           else if(mediaErr === 'NotAllowedError') pm.innerHTML = 'Bạn đang chặn camera và micro.<br>Bấm biểu tượng 🔒 / ⓘ cạnh địa chỉ trang → <b>Cho phép</b>, rồi bấm lại nút Video call.';
           else pm.innerHTML = 'Không tìm thấy camera và micro.<br>Bạn vẫn vào họp được ở chế độ chỉ xem và nghe.';
           if(mediaErr !== 'insecure'){ $('pvTap').textContent = '📷 Bật camera & micro'; $('pvTap').classList.remove('hidden'); pm.innerHTML += '<br><br><br>'; }
+        }else if(!hasCam && prefs.voice){
+          pm.innerHTML = '<div><div style="font-size:34px;line-height:1.2">📞</div><b>Chế độ gọi thoại</b> – camera không bật.<br>Trong cuộc họp vẫn bấm <b>🖥️ Màn hình</b> để chia sẻ, hướng dẫn.<br>🎧 Đeo tai nghe để tiếng rõ, không vọng.</div>';
         }else if(!hasCam){
           pm.innerHTML = 'Không tìm thấy camera.<br>Bạn vẫn vào họp bằng giọng nói được.';
         }
@@ -2251,6 +2258,13 @@ function createApp(opts){
   });
   $('inCode').addEventListener('keydown', function(e){ if(e.key === 'Enter') join(); });
   $('inHost').addEventListener('keydown', function(e){ if(e.key === 'Enter') join(); });
+  $('chkVoice').onchange = function(){
+    prefs.voice = this.checked; store('voice', prefs.voice ? '1' : '0');
+    if(joined) return;
+    $('pvTap').classList.add('hidden');
+    $('pvMsg').innerHTML = prefs.voice ? 'Đang chuyển sang chế độ gọi thoại…' : 'Đang mở camera và micro…';
+    mediaReady = Promise.resolve(mediaReady).catch(noop).then(function(){ return startMedia(); });
+  };
   $('chkSpkOff').onchange = function(){ prefs.spkOff = this.checked; store('spkOff', prefs.spkOff ? '1' : '0'); };
   setRole(role);
   var canAuto = !INVITE || (role === 'guest' ? normCode($('inCode').value).length === CODE_LEN : hostRemembered());
@@ -2842,18 +2856,21 @@ function createApp(opts){
       pc.getSenders().forEach(function(s){
         if(!s.track || !s.getParameters || !s.setParameters) return;
         if(s.track.kind === 'audio'){
-          applyParams(s, function(p){ p.encodings.forEach(function(e){ e.maxBitrate = 64000; e.priority = 'high'; e.networkPriority = 'high'; }); });
+          applyParams(s, function(p){ p.encodings.forEach(function(e){ e.active = true; e.maxBitrate = 64000; e.priority = 'high'; e.networkPriority = 'high'; }); });
           return;
         }
+        var cap = pr.upCap > 0 ? Math.max(150000, Math.round((pr.upCap - 96000) * 0.85)) : 0;   // 3.0: luôn chừa phần mạng cho tiếng nói
         applyParams(s, function(p){
-          p.degradationPreference = 'balanced';   // 2.0: mạng yếu thì giảm nhẹ cả nét lẫn khung hình → không đứng hình giật cục   // camera: giữ cân bằng nét/mượt
+          // 3.0: chia sẻ màn hình giữ chữ nét (mạng yếu thì giảm khung hình chứ không làm mờ chữ)
+          p.degradationPreference = screenTrack ? 'maintain-resolution' : 'balanced';   // 2.0: mạng yếu thì giảm nhẹ cả nét lẫn khung hình → không đứng hình giật cục   // camera: giữ cân bằng nét/mượt
           p.encodings.forEach(function(e){
             if(pr.viewW === 0){ e.active = false; return; }      // người xem đang thu nhỏ: tạm ngừng gửi hình cho họ
+            if(!screenTrack && !camOn){ e.active = false; return; }   // 3.0: không camera, không chia sẻ → không gửi hình nào
             e.active = true;
             if(screenTrack){
               // 2.0: ít người → 24 hình/giây (cuộn trang, video mượt); đông người → giảm để máy chia sẻ không nghẽn mạng
               var sb = n <= 1 ? 3500000 : n <= 2 ? 2800000 : n <= 4 ? 1800000 : 1100000;
-              e.maxBitrate = sb; e.maxFramerate = n <= 2 ? 24 : n <= 4 ? 15 : 10;
+              e.maxBitrate = cap ? Math.min(sb, cap) : sb; e.maxFramerate = n <= 2 ? 24 : n <= 4 ? 15 : 10;
               e.scaleResolutionDownBy = sw > 1920 ? Math.round(sw / 1920 * 100) / 100 : 1;   // giữ đủ độ nét để người xem phóng to
               return;
             }
@@ -2861,12 +2878,30 @@ function createApp(opts){
             if(pr.viewW > 0 && sw > 0) sc = Math.max(sc, clamp(sw / pr.viewW, 1, 4));
             e.scaleResolutionDownBy = Math.round(sc * 100) / 100;
             e.maxBitrate = Math.round(clamp(vb / (sc * sc) * 1.5, 250000, vb));
+            if(cap) e.maxBitrate = Math.min(e.maxBitrate, cap);
             e.maxFramerate = fps;
           });
         });
       });
     });
   }
+  // 3.0: đo mạng gửi đi của từng người (mỗi 3 giây). Mạng tụt → giảm hình ngay để tiếng nói không bị rè / mất chữ
+  function netWatch(){
+    if(dead || !joined) return;
+    var changed = false, jobs = [];
+    Object.keys(peers).forEach(function(id){
+      var pr = peers[id], pc = pr.call && pr.call.peerConnection; if(!pc || !pc.getStats) return;
+      jobs.push(pc.getStats().then(function(st){
+        var cap = 0;
+        st.forEach(function(r){ if(r.type === 'candidate-pair' && (r.nominated || r.selected) && r.state === 'succeeded' && r.availableOutgoingBitrate) cap = Math.max(cap, r.availableOutgoingBitrate); });
+        if(!cap) return;
+        var old = pr.upCap || 0;
+        if(!old || Math.abs(cap - old) / old > 0.2){ pr.upCap = cap; changed = true; }
+      }).catch(noop));
+    });
+    Promise.all(jobs).then(function(){ if(changed && !dead) tuneSenders(); });
+  }
+  every(netWatch, 3000);
   // Báo cho từng người biết mình đang xem họ ở khung cỡ nào → họ gửi hình vừa đủ, đỡ giật
   var sentView = {}, viewTimer = null;
   function queueViews(){ clearTimeout(viewTimer); viewTimer = setTimeout(reportViews, 350); }
@@ -3343,7 +3378,7 @@ function createApp(opts){
       return;
     }
     camOn = !camOn; rawCam.enabled = camOn; camTrack.enabled = camOn;
-    refreshLocal(); broadcast();
+    refreshLocal(); broadcast(); tuneSenders();   // 3.0: tắt camera → ngừng gửi hình, dành mạng cho tiếng nói
   };
   $('btnSet').onclick = function(){ refreshDevices(); $('setModal').classList.remove('hidden'); };
   $('btnSetClose').onclick = function(){ $('setModal').classList.add('hidden'); };
@@ -3645,7 +3680,7 @@ function sdpTune(sdp){
         var m = {}, keys = [];
         str.split(';').forEach(function(kv){ var i = kv.indexOf('='); if(i > 0){ var k = kv.slice(0, i).trim(); if(!(k in m)) keys.push(k); m[k] = kv.slice(i + 1).trim(); } });
         // useinbandfec: tự vá gói tiếng bị mất · usedtx=0: tiếng liền, không ngắt quãng · mono 40 kbps: giọng nói rõ
-        [['useinbandfec','1'], ['usedtx','0'], ['stereo','0'], ['sprop-stereo','0'], ['maxaveragebitrate','40000']].forEach(function(x){ if(!(x[0] in m)) keys.push(x[0]); m[x[0]] = x[1]; });
+        [['useinbandfec','1'], ['usedtx','0'], ['stereo','0'], ['sprop-stereo','0'], ['maxaveragebitrate','48000'], ['maxplaybackrate','48000']].forEach(function(x){ if(!(x[0] in m)) keys.push(x[0]); m[x[0]] = x[1]; });
         return keys.map(function(k){ return k + '=' + m[k]; }).join(';');
       };
       var re = new RegExp('a=fmtp:' + opus + ' ([^\\r\\n]*)');
